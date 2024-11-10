@@ -100,7 +100,7 @@ The prefix `spring.ai.retry` is used as the property prefix that lets you config
 
 The https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-qianfan/src/main/java/org/springframework/ai/qianfan/QianFanImageOptions.java[QianFanImageOptions.java] provides model configurations, such as the model to use, the quality, the size, etc.
 
-On start-up, the default options can be configured with the `QianFanImageModel(QianFanImageApi qianFanImageApi)` constructor and the `withDefaultOptions(QianFanImageOptions defaultOptions)` method.  Alternatively, use the `spring.ai.qianfan.image.options.*` properties described previously.
+On start-up, the default options can be configured with the `QianFanImageModel(QianFanImageApi xinHuoImageApi)` constructor and the `withDefaultOptions(QianFanImageOptions defaultOptions)` method.  Alternatively, use the `spring.ai.qianfan.image.options.*` properties described previously.
 
 At runtime you can override the default options by adding new, request specific, options to the `ImagePrompt` call.
 For example to override the QianFan specific options such as quality and the number of images to create, use the following code example:
