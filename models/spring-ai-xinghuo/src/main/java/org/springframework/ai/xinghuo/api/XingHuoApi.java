@@ -17,6 +17,7 @@
 package org.springframework.ai.xinghuo.api;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,7 +27,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.ai.xinghuo.api.auth.AuthApi;
-import org.springframework.ai.retry.RetryUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -54,72 +54,28 @@ public class XingHuoApi extends AuthApi {
 	private final WebClient webClient;
 
 	/**
-	 * Create a new chat completion api with default base URL.
-	 *
-	 * @param apiKey QianFan api key.
-	 * @param secretKey QianFan secret key.
-	 */
-	public XingHuoApi(String apiKey, String secretKey) {
-		this(XingHuoConstants.DEFAULT_BASE_URL, apiKey, secretKey);
-	}
-
-	/**
 	 * Create a new chat completion api.
 	 *
-	 * @param baseUrl api base URL.
-	 * @param apiKey QianFan api key.
-	 * @param secretKey QianFan secret key.
-	 */
-	public XingHuoApi(String baseUrl, String apiKey, String secretKey) {
-		this(baseUrl, apiKey, secretKey, RestClient.builder());
-	}
-
-	/**
-	 * Create a new chat completion api.
-	 *
-	 * @param baseUrl api base URL.
-	 * @param apiKey QianFan api key.
-	 * @param secretKey QianFan secret key.
-	 * @param restClientBuilder RestClient builder.
-	 */
-	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder) {
-		this(baseUrl, apiKey, secretKey, restClientBuilder, RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
-	}
-
-	/**
-	 * Create a new chat completion api.
-	 *
-	 * @param baseUrl api base URL.
-	 * @param apiKey QianFan api key.
-	 * @param secretKey QianFan secret key.
-	 * @param restClientBuilder RestClient builder.
-	 * @param responseErrorHandler Response error handler.
-	 */
-	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
-		this(baseUrl, apiKey, secretKey, restClientBuilder, WebClient.builder(), responseErrorHandler);
-	}
-
-	/**
-	 * Create a new chat completion api.
-	 *
-	 * @param baseUrl api base URL.
-	 * @param apiKey QianFan api key.
-	 * @param secretKey QianFan secret key.
+	 * @param host       The request host, e.g., "spark-api.xf-yun.com"
+	 * @param path       The request path, e.g., "/v1.1/chat"
+	 * @param httpMethod The HTTP method, e.g., "POST"
+	 * @param apiKey     The API Key obtained from the console
+	 * @param apiSecret  The API Secret obtained from the console
 	 * @param restClientBuilder RestClient builder.
 	 * @param webClientBuilder     WebClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder,
-					  WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
+	public XingHuoApi(String host, String path, String httpMethod, String apiKey, String apiSecret, RestClient.Builder restClientBuilder,
+					  WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) throws Exception {
 
 		this.restClient = restClientBuilder
-				.baseUrl(baseUrl)
+				.baseUrl(generateAuthUrl(host, path, httpMethod, apiKey, apiSecret))
 				.defaultHeaders(XingHuoUtils.defaultHeaders())
 				.defaultStatusHandler(responseErrorHandler)
 				.build();
 
 		this.webClient = webClientBuilder
-				.baseUrl(baseUrl)
+				.baseUrl(generateAuthUrl(host, path, httpMethod, apiKey, apiSecret))
 				.defaultHeaders(XingHuoUtils.defaultHeaders())
 				.build();
 	}
@@ -136,7 +92,6 @@ public class XingHuoApi extends AuthApi {
 		Assert.isTrue(!chatRequest.stream(), "Request must set the stream property to false.");
 
 		return this.restClient.post()
-				.uri("/v1/wenxinworkshop/chat/{model}?access_token={token}", chatRequest.model, generateAuthUrl())
 				.body(chatRequest)
 				.retrieve()
 				.toEntity(ChatCompletion.class);
@@ -193,25 +148,12 @@ public class XingHuoApi extends AuthApi {
 	 * <a href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu#%E5%AF%B9%E8%AF%9Dchat">QianFan Model</a>.
 	 */
 	public enum ChatModel {
-		ERNIE_4_0_8K("completions_pro"),
-		ERNIE_4_0_8K_Preview("ernie-4.0-8k-preview"),
-		ERNIE_4_0_8K_Preview_0518("completions_adv_pro"),
-		ERNIE_4_0_8K_0329("ernie-4.0-8k-0329"),
-		ERNIE_4_0_8K_0104("ernie-4.0-8k-0104"),
-		ERNIE_3_5_8K("completions"),
-		ERNIE_3_5_128K("ernie-3.5-128k"),
-		ERNIE_3_5_8K_Preview("ernie-3.5-8k-preview"),
-		ERNIE_3_5_8K_0205("ernie-3.5-8k-0205"),
-		ERNIE_3_5_8K_0329("ernie-3.5-8k-0329"),
-		ERNIE_3_5_8K_1222("ernie-3.5-8k-1222"),
-		ERNIE_3_5_4K_0205("ernie-3.5-4k-0205"),
-
-		ERNIE_Lite_8K_0922("eb-instant"),
-		ERNIE_Lite_8K_0308("ernie-lite-8k"),
-		ERNIE_Speed_8K("ernie_speed"),
-		ERNIE_Speed_128K("ernie-speed-128k"),
-		ERNIE_Tiny_8K("ernie-tiny-8k"),
-		ERNIE_FUNC_8K("ernie-func-8k");
+		LITE("lite"),
+		GENERA_V_3("generalv3"),
+		GENERAL_V_3_5("generalv3.5"),
+		PRO_128K("pro-128k"),
+		MAX_32K("max-32k"),
+		_4_0_ULTRA("4.0Ultra");
 
 		public final String  value;
 
@@ -273,7 +215,6 @@ public class XingHuoApi extends AuthApi {
 	 * appear in the text so far, increasing the model's likelihood to talk about new topics.
 	 * @param responseFormat An object specifying the format that the model must output. Setting to { "type":
 	 * "json_object" } enables JSON mode, which guarantees the message the model generates is valid JSON.
-	 * @param stop Up to 4 sequences where the API will stop generating further tokens.
 	 * @param stream If set, partial message deltas will be sent.Tokens will be sent as data-only server-sent events as
 	 * they become available, with the stream terminated by a data: [DONE] message.
 	 * @param temperature What sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output
@@ -283,68 +224,157 @@ public class XingHuoApi extends AuthApi {
 	 * results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10%
 	 * probability mass are considered. We generally recommend altering this or temperature but not both.
 	 */
-	@JsonInclude(Include.NON_NULL)
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public record ChatCompletionRequest(
-			@JsonProperty("messages") List<ChatCompletionMessage> messages,
-			@JsonProperty("system") String system,
+			/*
+			  Specifies the model version to access.
+			  Allowed values:
+			  - lite
+			  - generalv3
+			  - pro-128k
+			  - generalv3.5
+			  - max-32k
+			  - 4.0Ultra
+			 */
 			@JsonProperty("model") String model,
-			@JsonProperty("frequency_penalty") Double frequencyPenalty,
-			@JsonProperty("max_output_tokens") Integer maxTokens,
-			@JsonProperty("presence_penalty") Double presencePenalty,
-			@JsonProperty("response_format") ResponseFormat responseFormat,
-			@JsonProperty("stop") List<String> stop,
-			@JsonProperty("stream") Boolean stream,
+
+			/*
+			  Unique user ID representing a user (e.g., user_123456).
+			 */
+			@JsonProperty("user") String user,
+
+			/*
+			  Array of input messages.
+			 */
+			@JsonProperty("messages") List<ChatCompletionMessage> messages,
+
+			/*
+			  Sampling threshold, range [0, 2], default value 1.0.
+			 */
 			@JsonProperty("temperature") Double temperature,
-			@JsonProperty("top_p") Double topP) {
+
+			/*
+			  Probability threshold for nucleus sampling, range (0, 1], default value 1.
+			 */
+			@JsonProperty("top_p") Double topP,
+
+			/*
+			  Randomly select one from k options, range [1, 6], default value 4.
+			 */
+			@JsonProperty("top_k") Integer topK,
+
+			/*
+			  Penalty value for repeated words, range [-2.0, 2.0], default 0.
+			 */
+			@JsonProperty("presence_penalty") Double presencePenalty,
+
+			/*
+			  Penalty value for frequency, range [-2.0, 2.0], default 0.
+			 */
+			@JsonProperty("frequency_penalty") Double frequencyPenalty,
+
+			/*
+			  Whether to return results in a streaming manner, default false.
+			  If true, the server pushes results using SSE, and the client must handle the streamed data.
+			 */
+			@JsonProperty("stream") Boolean stream,
+
+			/*
+			  Maximum length of the model's response in tokens.
+			  - For Pro, Max, Max-32K, 4.0 Ultra: [1, 8192], default 4096.
+			  - For Lite, Pro-128K: [1, 4096], default 4096.
+			 */
+			@JsonProperty("max_tokens") Integer maxTokens,
+
+			/*
+			  Specifies the format of the model's output.
+			 */
+			@JsonProperty("response_format") ResponseFormat responseFormat,
+
+			/*
+			  Tool parameters.
+			 */
+			@JsonProperty("tools") List<Tool> tools,
+
+			/*
+			  Sets how the model chooses to call functions.
+			  Allowed values:
+			  - "auto"
+			  - "none"
+			  - "required"
+			  - Specific function object
+			 */
+			@JsonProperty("tool_choice") Object toolChoice
+	)
+	{
 
 		/**
-		 * Shortcut constructor for a chat completion request with the given messages and model.
-		 *
-		 * @param messages A list of messages comprising the conversation so far.
-		 * @param model ID of the model to use.
-		 * @param temperature What sampling temperature to use, between 0 and 1.
+		 * Represents the response format.
 		 */
-		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String system, String model, Double temperature) {
-			this(messages, system, model, null, null,
-					null, null, null, false, temperature, null);
-		}
-
-		/**
-		 * Shortcut constructor for a chat completion request with the given messages, model and control for streaming.
-		 *
-		 * @param messages A list of messages comprising the conversation so far.
-		 * @param model ID of the model to use.
-		 * @param temperature What sampling temperature to use, between 0 and 1.
-		 * @param stream If set, partial message deltas will be sent.Tokens will be sent as data-only server-sent events
-		 * as they become available, with the stream terminated by a data: [DONE] message.
-		 */
-		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String system, String model, Double temperature, boolean stream) {
-			this(messages, system, model, null, null,
-					null, null, null, stream, temperature, null);
-		}
-
-
-		/**
-		 * Shortcut constructor for a chat completion request with the given messages, model, tools and tool choice.
-		 * Streaming is set to false, temperature to 0.8 and all other parameters are null.
-		 *
-		 * @param messages A list of messages comprising the conversation so far.
-		 * @param stream If set, partial message deltas will be sent.Tokens will be sent as data-only server-sent events
-		 * as they become available, with the stream terminated by a data: [DONE] message.
-		 */
-		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String system, Boolean stream) {
-			this(messages, system, DEFAULT_CHAT_MODEL, null, null,
-					null, null, null, stream, 0.8, null);
-		}
-
-		/**
-		 * An object specifying the format that the model must output.
-		 * @param type Must be one of 'text' or 'json_object'.
-		 */
-		@JsonInclude(Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		public record ResponseFormat(
-				@JsonProperty("type") String type) {
+				/*
+				  Type of the response. Allowed values: "text", "json_object".
+				 */
+				@JsonProperty("type") String type
+		) {}
+
+		/**
+		 * Represents tool parameters.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public sealed interface Tool permits FunctionTool, WebSearchTool {
 		}
+
+		/**
+		 * Represents a function call tool.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record FunctionTool(
+				@JsonProperty("type") String type, // Should be "function"
+				@JsonProperty("function") FunctionDetail function
+		) implements Tool {}
+
+		/**
+		 * Represents the details of a function.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record FunctionDetail(
+				/*
+				  Name of the function.
+				 */
+				@JsonProperty("name") String name,
+
+				/*
+				  Description of the function.
+				 */
+				@JsonProperty("description") String description,
+
+				/*
+				  Parameters of the function, must comply with JSON Schema.
+				 */
+				@JsonProperty("parameters") Map<String, Object> parameters
+		) {}
+
+		/**
+		 * Represents a web search tool.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record WebSearchTool(
+				@JsonProperty("type") String type, // Should be "web_search"
+				@JsonProperty("web_search") WebSearchDetail webSearch
+		) implements Tool {}
+
+		/**
+		 * Represents the details of web search configuration.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record WebSearchDetail(
+				/*
+				  Enables or disables the web search functionality.
+				 */
+				@JsonProperty("enable") Boolean enable
+		) {}
 	}
 
 	/**
@@ -390,43 +420,149 @@ public class XingHuoApi extends AuthApi {
 			 * Assistant message.
 			 */
 			@JsonProperty("assistant")
-			ASSISTANT
+			ASSISTANT,
+
+			/**
+			 * Tool message.
+			 */
+			@JsonProperty("tool")
+			TOOL
 		}
 	}
 
 	/**
-	 * Represents a chat completion response returned by model, based on the provided input.
-	 *
-	 * @param id A unique identifier for the chat completion.
-	 * @param result Result of chat completion message.
-	 * @param created The Unix timestamp (in seconds) of when the chat completion was created.
-	 * used in conjunction with the seed request parameter to understand when backend changes have been made that might
-	 * impact determinism.
-	 * @param object The object type, which is always chat.completion.
-	 * @param usage Usage statistics for the completion request.
+	 * Represents a chat completion response returned by the model based on the provided input.
 	 */
-	@JsonInclude(Include.NON_NULL)
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public record ChatCompletion(
-			@JsonProperty("id") String id,
-			@JsonProperty("object") String object,
-			@JsonProperty("created") Long created,
-			@JsonProperty("result") String result,
-			@JsonProperty("finish_reason") String finishReason,
-			@JsonProperty("usage") Usage usage) {
-	}
+			/*
+			  Error code: 0 indicates success, non-zero indicates an error.
+			 */
+			@JsonProperty("code") int code,
 
-	/**
-	 * Usage statistics for the completion request.
-	 *
-	 * @param promptTokens Number of tokens in the prompt.
-	 * @param totalTokens Total number of tokens used in the request (prompt + completion).
-	 */
-	@JsonInclude(Include.NON_NULL)
-	public record Usage(
-			@JsonProperty("completion_tokens") Integer completionTokens,
-			@JsonProperty("prompt_tokens") Integer promptTokens,
-			@JsonProperty("total_tokens") Integer totalTokens) {
+			/*
+			  Description of the error code.
+			 */
+			@JsonProperty("message") String message,
 
+			/*
+			  Unique identifier for this request.
+			 */
+			@JsonProperty("sid") String sid,
+
+			/*
+			  Array of model results.
+			 */
+			@JsonProperty("choices") List<Choice> choices,
+
+			/*
+			  Token usage statistics for this request.
+			 */
+			@JsonProperty("usage") Usage usage
+	) {
+		/**
+		 * Represents a single choice/result from the model.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record Choice(
+				/*
+				  Result index, used when there are multiple candidates.
+				 */
+				@JsonProperty("index") int index,
+
+				/*
+				  The message object containing the role and content.
+				  This field is present in one of the response formats.
+				 */
+				@JsonProperty("message") Message message,
+
+				/*
+				  The delta object containing the role and content.
+				  This field is present in one of the response formats.
+				 */
+				@JsonProperty("delta") Delta delta
+		) {
+			/**
+			 * Utility method to retrieve the role, regardless of whether it's in message or delta.
+			 *
+			 * @return the role as a String, or null if neither is present.
+			 */
+			public String role() {
+				if (message != null) {
+					return message.role();
+				} else if (delta != null) {
+					return delta.role();
+				}
+				return null;
+			}
+
+			/**
+			 * Utility method to retrieve the content, regardless of whether it's in message or delta.
+			 *
+			 * @return the content as a String, or null if neither is present.
+			 */
+			public String content() {
+				if (message != null) {
+					return message.content();
+				} else if (delta != null) {
+					return delta.content();
+				}
+				return null;
+			}
+		}
+
+		/**
+		 * Represents the message object within a choice.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record Message(
+				/*
+				  Role of the message sender. Possible values: user, assistant, system, tool.
+				 */
+				@JsonProperty("role") String role,
+
+				/*
+				  Content of the message generated by the model.
+				 */
+				@JsonProperty("content") String content
+		) {}
+
+		/**
+		 * Represents the delta object within a choice.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record Delta(
+				/*
+				  Role of the delta sender. Possible values: user, assistant, system, tool.
+				 */
+				@JsonProperty("role") String role,
+
+				/*
+				  Content of the delta generated by the model.
+				 */
+				@JsonProperty("content") String content
+		) {}
+
+		/**
+		 * Usage statistics for the completion request.
+		 */
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		public record Usage(
+				/*
+				  Number of tokens consumed by the user's input.
+				 */
+				@JsonProperty("prompt_tokens") int promptTokens,
+
+				/*
+				  Number of tokens consumed by the model's output.
+				 */
+				@JsonProperty("completion_tokens") int completionTokens,
+
+				/*
+				  Total number of tokens consumed (prompt + completion).
+				 */
+				@JsonProperty("total_tokens") int totalTokens
+		) {}
 	}
 
 	/**

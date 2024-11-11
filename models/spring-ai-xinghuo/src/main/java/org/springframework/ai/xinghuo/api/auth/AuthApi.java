@@ -17,7 +17,6 @@
 package org.springframework.ai.xinghuo.api.auth;
 
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -29,9 +28,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * QianFan abstract authentication API.
+ * XingHuo abstract authentication API.
  *
- * @author Geng Rong
+ * @author Guangdong Liu
  * @since 1.0
  */
 public abstract class AuthApi {
@@ -55,9 +54,8 @@ public abstract class AuthApi {
 		String authorization = generateAuthorization(host, date, httpMethod, path, apiKey, apiSecret);
 
 		// 3. Build the final URL with authentication parameters
-		String url = buildUrl(host, path, authorization, date);
 
-		return url;
+        return buildUrl(host, path, authorization, date);
 	}
 
 	/**
