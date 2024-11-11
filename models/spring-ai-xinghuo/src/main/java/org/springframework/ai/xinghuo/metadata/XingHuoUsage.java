@@ -17,7 +17,7 @@
 package org.springframework.ai.xinghuo.metadata;
 
 import org.springframework.ai.chat.metadata.Usage;
-import org.springframework.ai.xinghuo.api.XinHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
 import org.springframework.util.Assert;
 
 /**
@@ -25,20 +25,20 @@ import org.springframework.util.Assert;
  *
  * @author Thomas Vitale
  */
-public class XinHuoUsage implements Usage {
+public class XingHuoUsage implements Usage {
 
-	private final XinHuoApi.Usage usage;
+	private final XingHuoApi.Usage usage;
 
-	protected XinHuoUsage(XinHuoApi.Usage usage) {
+	protected XingHuoUsage(XingHuoApi.Usage usage) {
 		Assert.notNull(usage, "QianFan Usage must not be null");
 		this.usage = usage;
 	}
 
-	public static XinHuoUsage from(XinHuoApi.Usage usage) {
-		return new XinHuoUsage(usage);
+	public static XingHuoUsage from(XingHuoApi.Usage usage) {
+		return new XingHuoUsage(usage);
 	}
 
-	protected XinHuoApi.Usage getUsage() {
+	protected XingHuoApi.Usage getUsage() {
 		return this.usage;
 	}
 

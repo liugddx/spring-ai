@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.chat;
+package org.springframework.ai.xinghuo.chat;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,10 +51,10 @@ import static org.springframework.ai.chat.observation.ChatModelObservationDocume
  *
  * @author Geng Rong
  */
-@SpringBootTest(classes = QianFanChatModelObservationIT.Config.class)
+@SpringBootTest(classes = XingHuoChatModelObservationIT.Config.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-public class QianFanChatModelObservationIT {
+public class XingHuoChatModelObservationIT {
 
 	@Autowired
 	TestObservationRegistry observationRegistry;

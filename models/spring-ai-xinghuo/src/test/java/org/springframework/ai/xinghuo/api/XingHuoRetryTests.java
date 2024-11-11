@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.api;
+package org.springframework.ai.xinghuo.api;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,10 +34,10 @@ import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.qianfan.QianFanChatModel;
 import org.springframework.ai.qianfan.QianFanChatOptions;
-import org.springframework.ai.qianfan.XinHuoEmbeddingModel;
-import org.springframework.ai.qianfan.XinHuoEmbeddingOptions;
-import org.springframework.ai.qianfan.XinHuoImageModel;
-import org.springframework.ai.qianfan.XinHuoImageOptions;
+import org.springframework.ai.qianfan.XingHuoEmbeddingModel;
+import org.springframework.ai.qianfan.XingHuoEmbeddingOptions;
+import org.springframework.ai.qianfan.XingHuoImageModel;
+import org.springframework.ai.qianfan.XingHuoImageOptions;
 import org.springframework.ai.qianfan.api.XinHuoApi.ChatCompletion;
 import org.springframework.ai.qianfan.api.XinHuoApi.ChatCompletionChunk;
 import org.springframework.ai.qianfan.api.XinHuoApi.ChatCompletionRequest;
@@ -64,7 +64,7 @@ import static org.mockito.BDDMockito.given;
  * @author Geng Rong
  */
 @ExtendWith(MockitoExtension.class)
-public class QianFanRetryTests {
+public class XingHuoRetryTests {
 
 	private TestRetryListener retryListener;
 
@@ -74,9 +74,9 @@ public class QianFanRetryTests {
 
 	private QianFanChatModel chatClient;
 
-	private XinHuoEmbeddingModel embeddingClient;
+	private XingHuoEmbeddingModel embeddingClient;
 
-	private XinHuoImageModel imageModel;
+	private XingHuoImageModel imageModel;
 
 	@BeforeEach
 	public void beforeEach() {
@@ -85,9 +85,9 @@ public class QianFanRetryTests {
 		retryTemplate.registerListener(this.retryListener);
 
 		this.chatClient = new QianFanChatModel(this.xinHuoApi, QianFanChatOptions.builder().build(), retryTemplate);
-		this.embeddingClient = new XinHuoEmbeddingModel(this.xinHuoApi, MetadataMode.EMBED,
-				XinHuoEmbeddingOptions.builder().build(), retryTemplate);
-		this.imageModel = new XinHuoImageModel(this.xinHuoImageApi, XinHuoImageOptions.builder().build(),
+		this.embeddingClient = new XingHuoEmbeddingModel(this.xinHuoApi, MetadataMode.EMBED,
+				XingHuoEmbeddingOptions.builder().build(), retryTemplate);
+		this.imageModel = new XingHuoImageModel(this.xinHuoImageApi, XingHuoImageOptions.builder().build(),
 				retryTemplate);
 	}
 

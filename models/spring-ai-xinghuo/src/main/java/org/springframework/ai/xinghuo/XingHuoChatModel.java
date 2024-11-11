@@ -44,49 +44,49 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.xinghuo.api.XinHuoApi;
-import org.springframework.ai.xinghuo.api.XinHuoApi.ChatCompletion;
-import org.springframework.ai.xinghuo.api.XinHuoApi.ChatCompletionChunk;
-import org.springframework.ai.xinghuo.api.XinHuoApi.ChatCompletionMessage;
-import org.springframework.ai.xinghuo.api.XinHuoApi.ChatCompletionMessage.Role;
-import org.springframework.ai.xinghuo.api.XinHuoApi.ChatCompletionRequest;
-import org.springframework.ai.xinghuo.api.XinHuoConstants;
-import org.springframework.ai.xinghuo.metadata.XinHuoUsage;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletion;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionChunk;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage.Role;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionRequest;
+import org.springframework.ai.xinghuo.api.XingHuoConstants;
+import org.springframework.ai.xinghuo.metadata.XingHuoUsage;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
 /**
- * {@link ChatModel} and {@link StreamingChatModel} implementation for {@literal QianFan}
- * backed by {@link XinHuoApi}.
+ * {@link ChatModel} and {@link StreamingChatModel} implementation for {@literal XingHuo}
+ * backed by {@link XingHuoApi}.
  *
  * @author Geng Rong
  * @see ChatModel
  * @see StreamingChatModel
- * @see XinHuoApi
+ * @see XingHuoApi
  * @since 1.0
  */
-public class QianFanChatModel implements ChatModel, StreamingChatModel {
+public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 
-	private static final Logger logger = LoggerFactory.getLogger(QianFanChatModel.class);
+	private static final Logger logger = LoggerFactory.getLogger(XingHuoChatModel.class);
 
 	private static final ChatModelObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultChatModelObservationConvention();
 
 	/**
-	 * The retry template used to retry the QianFan API calls.
+	 * The retry template used to retry the XingHuo API calls.
 	 */
 	public final RetryTemplate retryTemplate;
 
 	/**
 	 * The default options used for the chat completion requests.
 	 */
-	private final QianFanChatOptions defaultOptions;
+	private final XingHuoChatOptions defaultOptions;
 
 	/**
-	 * Low-level access to the QianFan API.
+	 * Low-level access to the XingHuo API.
 	 */
-	private final XinHuoApi xinHuoApi;
+	private final XingHuoApi xingHuoApi;
 
 	/**
 	 * Observation registry used for instrumentation.
@@ -99,52 +99,52 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 	private ChatModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
 
 	/**
-	 * Creates an instance of the QianFanChatModel.
-	 * @param xinHuoApi The QianFanApi instance to be used for interacting with the
-	 * QianFan Chat API.
-	 * @throws IllegalArgumentException if QianFanApi is null
+	 * Creates an instance of the XingHuoChatModel.
+	 * @param xingHuoApi The XingHuoApi instance to be used for interacting with the
+	 * XingHuo Chat API.
+	 * @throws IllegalArgumentException if XingHuoApi is null
 	 */
-	public QianFanChatModel(XinHuoApi xinHuoApi) {
-		this(xinHuoApi,
-				QianFanChatOptions.builder().withModel(XinHuoApi.DEFAULT_CHAT_MODEL).withTemperature(0.7).build());
+	public XingHuoChatModel(XingHuoApi xingHuoApi) {
+		this(xingHuoApi,
+				XingHuoChatOptions.builder().withModel(XingHuoApi.DEFAULT_CHAT_MODEL).withTemperature(0.7).build());
 	}
 
 	/**
-	 * Initializes an instance of the QianFanChatModel.
-	 * @param xinHuoApi The QianFanApi instance to be used for interacting with the
-	 * QianFan Chat API.
-	 * @param options The QianFanChatOptions to configure the chat client.
+	 * Initializes an instance of the XingHuoChatModel.
+	 * @param xingHuoApi The XingHuoApi instance to be used for interacting with the
+	 * XingHuo Chat API.
+	 * @param options The XingHuoChatOptions to configure the chat client.
 	 */
-	public QianFanChatModel(XinHuoApi xinHuoApi, QianFanChatOptions options) {
-		this(xinHuoApi, options, RetryUtils.DEFAULT_RETRY_TEMPLATE);
+	public XingHuoChatModel(XingHuoApi xingHuoApi, XingHuoChatOptions options) {
+		this(xingHuoApi, options, RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
 	/**
-	 * Initializes a new instance of the QianFanChatModel.
-	 * @param xinHuoApi The QianFanApi instance to be used for interacting with the
-	 * QianFan Chat API.
-	 * @param options The QianFanChatOptions to configure the chat client.
+	 * Initializes a new instance of the XingHuoChatModel.
+	 * @param xingHuoApi The XingHuoApi instance to be used for interacting with the
+	 * XingHuo Chat API.
+	 * @param options The XingHuoChatOptions to configure the chat client.
 	 * @param retryTemplate The retry template.
 	 */
-	public QianFanChatModel(XinHuoApi xinHuoApi, QianFanChatOptions options, RetryTemplate retryTemplate) {
-		this(xinHuoApi, options, retryTemplate, ObservationRegistry.NOOP);
+	public XingHuoChatModel(XingHuoApi xingHuoApi, XingHuoChatOptions options, RetryTemplate retryTemplate) {
+		this(xingHuoApi, options, retryTemplate, ObservationRegistry.NOOP);
 	}
 
 	/**
-	 * Initializes a new instance of the QianFanChatModel.
-	 * @param xinHuoApi The QianFanApi instance to be used for interacting with the
-	 * QianFan Chat API.
-	 * @param options The QianFanChatOptions to configure the chat client.
+	 * Initializes a new instance of the XingHuoChatModel.
+	 * @param xingHuoApi The XingHuoApi instance to be used for interacting with the
+	 * XingHuo Chat API.
+	 * @param options The XingHuoChatOptions to configure the chat client.
 	 * @param retryTemplate The retry template.
 	 * @param observationRegistry The ObservationRegistry used for instrumentation.
 	 */
-	public QianFanChatModel(XinHuoApi xinHuoApi, QianFanChatOptions options, RetryTemplate retryTemplate,
-			ObservationRegistry observationRegistry) {
-		Assert.notNull(xinHuoApi, "QianFanApi must not be null");
+	public XingHuoChatModel(XingHuoApi xingHuoApi, XingHuoChatOptions options, RetryTemplate retryTemplate,
+							ObservationRegistry observationRegistry) {
+		Assert.notNull(xingHuoApi, "XingHuoApi must not be null");
 		Assert.notNull(options, "Options must not be null");
 		Assert.notNull(retryTemplate, "RetryTemplate must not be null");
 		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
-		this.xinHuoApi = xinHuoApi;
+		this.xingHuoApi = xingHuoApi;
 		this.defaultOptions = options;
 		this.retryTemplate = retryTemplate;
 		this.observationRegistry = observationRegistry;
@@ -157,7 +157,7 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 
 		ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 			.prompt(prompt)
-			.provider(XinHuoConstants.PROVIDER_NAME)
+			.provider(XingHuoConstants.PROVIDER_NAME)
 			.requestOptions(buildRequestOptions(request))
 			.build();
 
@@ -166,7 +166,7 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 					this.observationRegistry)
 			.observe(() -> {
 				ResponseEntity<ChatCompletion> completionEntity = this.retryTemplate
-					.execute(ctx -> this.xinHuoApi.chatCompletionEntity(request));
+					.execute(ctx -> this.xingHuoApi.chatCompletionEntity(request));
 
 				var chatCompletion = completionEntity.getBody();
 				if (chatCompletion == null) {
@@ -195,11 +195,11 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 		return Flux.deferContextual(contextView -> {
 			ChatCompletionRequest request = createRequest(prompt, true);
 
-			var completionChunks = this.xinHuoApi.chatCompletionStream(request);
+			var completionChunks = this.xingHuoApi.chatCompletionStream(request);
 
 			final ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 				.prompt(prompt)
-				.provider(XinHuoConstants.PROVIDER_NAME)
+				.provider(XingHuoConstants.PROVIDER_NAME)
 				.requestOptions(buildRequestOptions(request))
 				.build();
 
@@ -266,7 +266,7 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 
 		if (prompt.getOptions() != null) {
 			var updatedRuntimeOptions = ModelOptionsUtils.copyToTarget(prompt.getOptions(), ChatOptions.class,
-					QianFanChatOptions.class);
+					XingHuoChatOptions.class);
 			request = ModelOptionsUtils.merge(updatedRuntimeOptions, request, ChatCompletionRequest.class);
 		}
 		return request;
@@ -274,10 +274,10 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 
 	@Override
 	public ChatOptions getDefaultOptions() {
-		return QianFanChatOptions.fromOptions(this.defaultOptions);
+		return XingHuoChatOptions.fromOptions(this.defaultOptions);
 	}
 
-	private ChatOptions buildRequestOptions(XinHuoApi.ChatCompletionRequest request) {
+	private ChatOptions buildRequestOptions(XingHuoApi.ChatCompletionRequest request) {
 		return ChatOptionsBuilder.builder()
 			.withModel(request.model())
 			.withFrequencyPenalty(request.frequencyPenalty())
@@ -289,11 +289,11 @@ public class QianFanChatModel implements ChatModel, StreamingChatModel {
 			.build();
 	}
 
-	private ChatResponseMetadata from(XinHuoApi.ChatCompletion result, String model) {
-		Assert.notNull(result, "QianFan ChatCompletionResult must not be null");
+	private ChatResponseMetadata from(XingHuoApi.ChatCompletion result, String model) {
+		Assert.notNull(result, "XingHuo ChatCompletionResult must not be null");
 		return ChatResponseMetadata.builder()
 			.withId(result.id() != null ? result.id() : "")
-			.withUsage(result.usage() != null ? XinHuoUsage.from(result.usage()) : new EmptyUsage())
+			.withUsage(result.usage() != null ? XingHuoUsage.from(result.usage()) : new EmptyUsage())
 			.withModel(model)
 			.withKeyValue("created", result.created() != null ? result.created() : 0L)
 			.build();

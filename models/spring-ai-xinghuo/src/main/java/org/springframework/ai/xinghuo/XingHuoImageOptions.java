@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan;
+package org.springframework.ai.xinghuo;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ import org.springframework.ai.image.ImageOptions;
  * @since 1.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class XinHuoImageOptions implements ImageOptions {
+public final class XingHuoImageOptions implements ImageOptions {
 
 	/**
 	 * The number of images to generate. Must be between 1 and 4.
@@ -167,7 +167,7 @@ public final class XinHuoImageOptions implements ImageOptions {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof XinHuoImageOptions that)) {
+		if (!(o instanceof XingHuoImageOptions that)) {
 			return false;
 		}
 		return Objects.equals(this.n, that.n) && Objects.equals(this.model, that.model)
@@ -190,10 +190,10 @@ public final class XinHuoImageOptions implements ImageOptions {
 
 	public static final class Builder {
 
-		private final XinHuoImageOptions options;
+		private final XingHuoImageOptions options;
 
 		private Builder() {
-			this.options = new XinHuoImageOptions();
+			this.options = new XingHuoImageOptions();
 		}
 
 		public Builder withN(Integer n) {
@@ -226,7 +226,7 @@ public final class XinHuoImageOptions implements ImageOptions {
 			return this;
 		}
 
-		public XinHuoImageOptions build() {
+		public XingHuoImageOptions build() {
 			return this.options;
 		}
 

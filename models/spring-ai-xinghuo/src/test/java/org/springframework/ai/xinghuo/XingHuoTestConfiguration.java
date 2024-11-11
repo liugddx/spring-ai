@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan;
+package org.springframework.ai.xinghuo;
 
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.qianfan.api.XinHuoApi;
-import org.springframework.ai.qianfan.api.XinHuoImageApi;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoImageApi;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
@@ -28,49 +28,49 @@ import org.springframework.util.StringUtils;
  * @author Geng Rong
  */
 @SpringBootConfiguration
-public class QianFanTestConfiguration {
+public class XingHuoTestConfiguration {
 
 	@Bean
-	public XinHuoApi qianFanApi() {
-		return new XinHuoApi(getApiKey(), getSecretKey());
+	public XingHuoApi XingHuoApi() {
+		return new XingHuoApi(getApiKey(), getSecretKey());
 	}
 
 	@Bean
-	public XinHuoImageApi qianFanImageApi() {
-		return new XinHuoImageApi(getApiKey(), getSecretKey());
+	public XingHuoImageApi XingHuoImageApi() {
+		return new XingHuoImageApi(getApiKey(), getSecretKey());
 	}
 
 	private String getApiKey() {
-		String apiKey = System.getenv("QIANFAN_API_KEY");
+		String apiKey = System.getenv("XingHuo_API_KEY");
 		if (!StringUtils.hasText(apiKey)) {
 			throw new IllegalArgumentException(
-					"You must provide an API key. Put it in an environment variable under the name QIANFAN_API_KEY");
+					"You must provide an API key. Put it in an environment variable under the name XingHuo_API_KEY");
 		}
 		return apiKey;
 	}
 
 	private String getSecretKey() {
-		String apiKey = System.getenv("QIANFAN_SECRET_KEY");
+		String apiKey = System.getenv("XingHuo_SECRET_KEY");
 		if (!StringUtils.hasText(apiKey)) {
 			throw new IllegalArgumentException(
-					"You must provide a secret key. Put it in an environment variable under the name QIANFAN_SECRET_KEY");
+					"You must provide a secret key. Put it in an environment variable under the name XingHuo_SECRET_KEY");
 		}
 		return apiKey;
 	}
 
 	@Bean
-	public QianFanChatModel qianFanChatModel(XinHuoApi api) {
-		return new QianFanChatModel(api);
+	public XingHuoChatModel XingHuoChatModel(XingHuoApi api) {
+		return new XingHuoChatModel(api);
 	}
 
 	@Bean
-	public EmbeddingModel qianFanEmbeddingModel(XinHuoApi api) {
-		return new XinHuoEmbeddingModel(api);
+	public EmbeddingModel XingHuoEmbeddingModel(XingHuoApi api) {
+		return new XingHuoEmbeddingModel(api);
 	}
 
 	@Bean
-	public ImageModel qianFanImageModel(XinHuoImageApi api) {
-		return new XinHuoImageModel(api);
+	public ImageModel XingHuoImageModel(XingHuoImageApi api) {
+		return new XingHuoImageModel(api);
 	}
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.api;
+package org.springframework.ai.xinghuo.api;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
-import org.springframework.ai.xinghuo.api.XinHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
 import org.stringtemplate.v4.ST;
 import reactor.core.publisher.Flux;
 
@@ -42,14 +42,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-public class XinHuoApiIT {
+public class XingHuoApiIT {
 
-	XinHuoApi xinHuoApi = new XinHuoApi(System.getenv("QIANFAN_API_KEY"), System.getenv("QIANFAN_SECRET_KEY"));
+	XingHuoApi xingHuoApi = new XingHuoApi(System.getenv("QIANFAN_API_KEY"), System.getenv("QIANFAN_SECRET_KEY"));
 
 	@Test
 	void chatCompletionEntity() {
 		ChatCompletionMessage chatCompletionMessage = new ChatCompletionMessage("Hello world", Role.USER);
-		ResponseEntity<ChatCompletion> response = this.xinHuoApi.chatCompletionEntity(new ChatCompletionRequest(
+		ResponseEntity<ChatCompletion> response = this.xingHuoApi.chatCompletionEntity(new ChatCompletionRequest(
 				List.of(chatCompletionMessage), buildSystemMessage(), "ernie_speed", 0.7, false));
 
 		assertThat(response).isNotNull();
@@ -59,7 +59,7 @@ public class XinHuoApiIT {
 	@Test
 	void chatCompletionStream() {
 		ChatCompletionMessage chatCompletionMessage = new ChatCompletionMessage("Hello world", Role.USER);
-		Flux<ChatCompletionChunk> response = this.xinHuoApi.chatCompletionStream(new ChatCompletionRequest(
+		Flux<ChatCompletionChunk> response = this.xingHuoApi.chatCompletionStream(new ChatCompletionRequest(
 				List.of(chatCompletionMessage), buildSystemMessage(), "ernie_speed", 0.7, true));
 
 		assertThat(response).isNotNull();
@@ -68,7 +68,7 @@ public class XinHuoApiIT {
 
 	@Test
 	void embeddings() {
-		ResponseEntity<EmbeddingList> response = this.xinHuoApi
+		ResponseEntity<EmbeddingList> response = this.xingHuoApi
 			.embeddings(new org.springframework.ai.qianfan.api.XinHuoApi.EmbeddingRequest("Hello world"));
 
 		assertThat(response).isNotNull();

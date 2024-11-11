@@ -1,2 +1,2 @@
 org.springframework.aot.hint.RuntimeHintsRegistrar=\
-	org.springframework.ai.xinghuo.aot.XinHuoRuntimeHints
+	org.springframework.ai.xinghuo.aot.XingHuoRuntimeHints

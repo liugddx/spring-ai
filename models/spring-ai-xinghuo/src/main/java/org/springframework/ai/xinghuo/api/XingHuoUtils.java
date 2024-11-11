@@ -21,13 +21,13 @@ import java.util.function.Consumer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-public final class XinHuoUtils {
+public final class XingHuoUtils {
 
 	public static Consumer<HttpHeaders> defaultHeaders() {
 		return headers -> headers.setContentType(MediaType.APPLICATION_JSON);
 	}
 
-	private XinHuoUtils() {
+	private XingHuoUtils() {
 
 	}
 

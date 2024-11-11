@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan;
+package org.springframework.ai.xinghuo;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.qianfan.api.XinHuoApi;
+import org.springframework.ai.xinghuo.XingHuoChatModel;
+import org.springframework.ai.xinghuo.XingHuoChatOptions;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,8 +33,8 @@ public class ChatCompletionRequestTests {
 	@Test
 	public void createRequestWithChatOptions() {
 
-		var client = new QianFanChatModel(new XinHuoApi("TEST", "TEST"),
-				QianFanChatOptions.builder().withModel("DEFAULT_MODEL").withTemperature(66.6).build());
+		var client = new XingHuoChatModel(new XingHuoApi("TEST", "TEST"),
+				XingHuoChatOptions.builder().withModel("DEFAULT_MODEL").withTemperature(66.6).build());
 
 		var request = client.createRequest(new Prompt("Test message content"), false);
 
@@ -43,7 +45,7 @@ public class ChatCompletionRequestTests {
 		assertThat(request.temperature()).isEqualTo(66.6);
 
 		request = client.createRequest(new Prompt("Test message content",
-				QianFanChatOptions.builder().withModel("PROMPT_MODEL").withTemperature(99.9).build()), true);
+				XingHuoChatOptions.builder().withModel("PROMPT_MODEL").withTemperature(99.9).build()), true);
 
 		assertThat(request.messages()).hasSize(1);
 		assertThat(request.stream()).isTrue();

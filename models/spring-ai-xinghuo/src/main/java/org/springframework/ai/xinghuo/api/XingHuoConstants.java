@@ -25,13 +25,13 @@ import org.springframework.ai.observation.conventions.AiProvider;
  * @author Geng Rong
  * @since 1.0
  */
-public final class XinHuoConstants {
+public final class XingHuoConstants {
 
 	public static final String DEFAULT_BASE_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom";
 
-	public static final String PROVIDER_NAME = AiProvider.QIANFAN.value();
+	public static final String PROVIDER_NAME = AiProvider.XingHuo.value();
 
-	private XinHuoConstants() {
+	private XingHuoConstants() {
 
 	}
 

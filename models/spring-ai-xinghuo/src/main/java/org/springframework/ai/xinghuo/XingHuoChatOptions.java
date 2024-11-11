@@ -24,11 +24,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.qianfan.api.XinHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
 
 /**
- * QianFanChatOptions represents the options for performing chat completion using the
- * QianFan API. It provides methods to set and retrieve various options like model,
+ * XingHuoChatOptions represents the options for performing chat completion using the
+ * XingHuo API. It provides methods to set and retrieve various options like model,
  * frequency penalty, max tokens, etc.
  *
  * @author Geng Rong
@@ -36,7 +36,7 @@ import org.springframework.ai.qianfan.api.XinHuoApi;
  * @see ChatOptions
  */
 @JsonInclude(Include.NON_NULL)
-public class XinHuoChatOptions implements ChatOptions {
+public class XingHuoChatOptions implements ChatOptions {
 
 	// @formatter:off
 	/**
@@ -62,7 +62,7 @@ public class XinHuoChatOptions implements ChatOptions {
 	 * An object specifying the format that the model must output. Setting to { "type":
 	 * "json_object" } enables JSON mode, which guarantees the message the model generates is valid JSON.
 	 */
-	private @JsonProperty("response_format") XinHuoApi.ChatCompletionRequest.ResponseFormat responseFormat;
+	private @JsonProperty("response_format") XingHuoApi.ChatCompletionRequest.ResponseFormat responseFormat;
 	/**
 	 * Up to 4 sequences where the API will stop generating further tokens.
 	 */
@@ -85,8 +85,8 @@ public class XinHuoChatOptions implements ChatOptions {
 		return new Builder();
 	}
 
-	public static QianFanChatOptions fromOptions(QianFanChatOptions fromOptions) {
-		return QianFanChatOptions.builder()
+	public static XingHuoChatOptions fromOptions(XingHuoChatOptions fromOptions) {
+		return XingHuoChatOptions.builder()
 			.withModel(fromOptions.getModel())
 			.withFrequencyPenalty(fromOptions.getFrequencyPenalty())
 			.withMaxTokens(fromOptions.getMaxTokens())
@@ -134,11 +134,11 @@ public class XinHuoChatOptions implements ChatOptions {
 		this.presencePenalty = presencePenalty;
 	}
 
-	public XinHuoApi.ChatCompletionRequest.ResponseFormat getResponseFormat() {
+	public XingHuoApi.ChatCompletionRequest.ResponseFormat getResponseFormat() {
 		return this.responseFormat;
 	}
 
-	public void setResponseFormat(XinHuoApi.ChatCompletionRequest.ResponseFormat responseFormat) {
+	public void setResponseFormat(XingHuoApi.ChatCompletionRequest.ResponseFormat responseFormat) {
 		this.responseFormat = responseFormat;
 	}
 
@@ -211,7 +211,7 @@ public class XinHuoChatOptions implements ChatOptions {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		QianFanChatOptions other = (QianFanChatOptions) obj;
+		XingHuoChatOptions other = (XingHuoChatOptions) obj;
 		if (this.model == null) {
 			if (other.model != null) {
 				return false;
@@ -280,19 +280,19 @@ public class XinHuoChatOptions implements ChatOptions {
 	}
 
 	@Override
-	public QianFanChatOptions copy() {
+	public XingHuoChatOptions copy() {
 		return fromOptions(this);
 	}
 
 	public static class Builder {
 
-		protected QianFanChatOptions options;
+		protected XingHuoChatOptions options;
 
 		public Builder() {
-			this.options = new QianFanChatOptions();
+			this.options = new XingHuoChatOptions();
 		}
 
-		public Builder(QianFanChatOptions options) {
+		public Builder(XingHuoChatOptions options) {
 			this.options = options;
 		}
 
@@ -316,7 +316,7 @@ public class XinHuoChatOptions implements ChatOptions {
 			return this;
 		}
 
-		public Builder withResponseFormat(XinHuoApi.ChatCompletionRequest.ResponseFormat responseFormat) {
+		public Builder withResponseFormat(XingHuoApi.ChatCompletionRequest.ResponseFormat responseFormat) {
 			this.options.responseFormat = responseFormat;
 			return this;
 		}
@@ -336,7 +336,7 @@ public class XinHuoChatOptions implements ChatOptions {
 			return this;
 		}
 
-		public QianFanChatOptions build() {
+		public XingHuoChatOptions build() {
 			return this.options;
 		}
 

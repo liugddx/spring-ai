@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.image;
+package org.springframework.ai.xinghuo.image;
 
 import io.micrometer.observation.tck.TestObservationRegistry;
 import io.micrometer.observation.tck.TestObservationRegistryAssert;
@@ -27,8 +27,8 @@ import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.image.observation.DefaultImageModelObservationConvention;
 import org.springframework.ai.observation.conventions.AiOperationType;
 import org.springframework.ai.observation.conventions.AiProvider;
-import org.springframework.ai.qianfan.XinHuoImageModel;
-import org.springframework.ai.qianfan.XinHuoImageOptions;
+import org.springframework.ai.qianfan.XingHuoImageModel;
+import org.springframework.ai.qianfan.XingHuoImageOptions;
 import org.springframework.ai.qianfan.api.XinHuoImageApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -41,24 +41,24 @@ import static org.springframework.ai.image.observation.ImageModelObservationDocu
 import static org.springframework.ai.image.observation.ImageModelObservationDocumentation.LowCardinalityKeyNames;
 
 /**
- * Integration tests for observation instrumentation in {@link XinHuoImageModel}.
+ * Integration tests for observation instrumentation in {@link XingHuoImageModel}.
  *
  * @author Geng Rong
  */
-@SpringBootTest(classes = QianFanImageModelObservationIT.Config.class)
+@SpringBootTest(classes = XingHuoImageModelObservationIT.Config.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-public class QianFanImageModelObservationIT {
+public class XingHuoImageModelObservationIT {
 
 	@Autowired
 	TestObservationRegistry observationRegistry;
 
 	@Autowired
-	XinHuoImageModel imageModel;
+    XingHuoImageModel imageModel;
 
 	@Test
 	void observationForImageOperation() {
-		var options = XinHuoImageOptions.builder()
+		var options = XingHuoImageOptions.builder()
 			.withModel(XinHuoImageApi.ImageModel.Stable_Diffusion_XL.getValue())
 			.withHeight(1024)
 			.withWidth(1024)
@@ -102,9 +102,9 @@ public class QianFanImageModelObservationIT {
 		}
 
 		@Bean
-		public XinHuoImageModel qianFanImageModel(XinHuoImageApi xinHuoImageApi,
-				TestObservationRegistry observationRegistry) {
-			return new XinHuoImageModel(xinHuoImageApi, XinHuoImageOptions.builder().build(),
+		public XingHuoImageModel qianFanImageModel(XinHuoImageApi xinHuoImageApi,
+                                                   TestObservationRegistry observationRegistry) {
+			return new XingHuoImageModel(xinHuoImageApi, XingHuoImageOptions.builder().build(),
 					RetryTemplate.defaultInstance(), observationRegistry);
 		}
 

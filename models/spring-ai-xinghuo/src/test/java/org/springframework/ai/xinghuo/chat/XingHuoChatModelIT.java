@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.chat;
+package org.springframework.ai.xinghuo.chat;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
-import org.springframework.ai.qianfan.QianFanTestConfiguration;
+import org.springframework.ai.qianfan.XingHuoTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,10 +45,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Geng Rong
  */
-@SpringBootTest(classes = QianFanTestConfiguration.class)
+@SpringBootTest(classes = XingHuoTestConfiguration.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-class QianFanChatModelIT {
+class XingHuoChatModelIT {
 
 	@Autowired
 	protected ChatModel chatModel;

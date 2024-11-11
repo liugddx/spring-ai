@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan;
+package org.springframework.ai.xinghuo;
 
 import java.util.List;
 
@@ -33,9 +33,9 @@ import org.springframework.ai.image.observation.ImageModelObservationContext;
 import org.springframework.ai.image.observation.ImageModelObservationConvention;
 import org.springframework.ai.image.observation.ImageModelObservationDocumentation;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.qianfan.api.XinHuoConstants;
-import org.springframework.ai.qianfan.api.XinHuoImageApi;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.xinghuo.api.XingHuoConstants;
+import org.springframework.ai.xinghuo.api.XingHuoImageApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
@@ -48,16 +48,16 @@ import org.springframework.util.Assert;
  * @author Geng Rong
  * @since 1.0
  */
-public class XinHuoImageModel implements ImageModel {
+public class XingHuoImageModel implements ImageModel {
 
-	private final static Logger logger = LoggerFactory.getLogger(XinHuoImageModel.class);
+	private final static Logger logger = LoggerFactory.getLogger(XingHuoImageModel.class);
 
 	private static final ImageModelObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultImageModelObservationConvention();
 
 	/**
 	 * The default options used for the image completion requests.
 	 */
-	private final XinHuoImageOptions defaultOptions;
+	private final XingHuoImageOptions defaultOptions;
 
 	/**
 	 * The retry template used to retry the QianFan Image API calls.
@@ -67,7 +67,7 @@ public class XinHuoImageModel implements ImageModel {
 	/**
 	 * Low-level access to the QianFan Image API.
 	 */
-	private final XinHuoImageApi xinHuoImageApi;
+	private final XingHuoImageApi xinHuoImageApi;
 
 	/**
 	 * Observation registry used for instrumentation.
@@ -85,8 +85,8 @@ public class XinHuoImageModel implements ImageModel {
 	 * the QianFan Image API.
 	 * @throws IllegalArgumentException if qianFanImageApi is null
 	 */
-	public XinHuoImageModel(XinHuoImageApi xinHuoImageApi) {
-		this(xinHuoImageApi, XinHuoImageOptions.builder().build(), RetryUtils.DEFAULT_RETRY_TEMPLATE);
+	public XingHuoImageModel(XingHuoImageApi xinHuoImageApi) {
+		this(xinHuoImageApi, XingHuoImageOptions.builder().build(), RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class XinHuoImageModel implements ImageModel {
 	 * @param options The QianFanImageOptions to configure the image model.
 	 * @throws IllegalArgumentException if qianFanImageApi is null
 	 */
-	public XinHuoImageModel(XinHuoImageApi xinHuoImageApi, XinHuoImageOptions options) {
+	public XingHuoImageModel(XingHuoImageApi xinHuoImageApi, XingHuoImageOptions options) {
 		this(xinHuoImageApi, options, RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
@@ -108,8 +108,8 @@ public class XinHuoImageModel implements ImageModel {
 	 * @param retryTemplate The retry template.
 	 * @throws IllegalArgumentException if qianFanImageApi is null
 	 */
-	public XinHuoImageModel(XinHuoImageApi xinHuoImageApi, XinHuoImageOptions options,
-			RetryTemplate retryTemplate) {
+	public XingHuoImageModel(XingHuoImageApi xinHuoImageApi, XingHuoImageOptions options,
+                             RetryTemplate retryTemplate) {
 		this(xinHuoImageApi, options, retryTemplate, ObservationRegistry.NOOP);
 	}
 
@@ -121,8 +121,8 @@ public class XinHuoImageModel implements ImageModel {
 	 * @param retryTemplate The retry template.
 	 * @param observationRegistry The ObservationRegistry used for instrumentation.
 	 */
-	public XinHuoImageModel(XinHuoImageApi xinHuoImageApi, XinHuoImageOptions options, RetryTemplate retryTemplate,
-			ObservationRegistry observationRegistry) {
+	public XingHuoImageModel(XingHuoImageApi xinHuoImageApi, XingHuoImageOptions options, RetryTemplate retryTemplate,
+							 ObservationRegistry observationRegistry) {
 		Assert.notNull(xinHuoImageApi, "QianFanImageApi must not be null");
 		Assert.notNull(options, "options must not be null");
 		Assert.notNull(retryTemplate, "retryTemplate must not be null");
@@ -135,13 +135,13 @@ public class XinHuoImageModel implements ImageModel {
 
 	@Override
 	public ImageResponse call(ImagePrompt imagePrompt) {
-		XinHuoImageOptions requestImageOptions = mergeOptions(imagePrompt.getOptions(), this.defaultOptions);
+		XingHuoImageOptions requestImageOptions = mergeOptions(imagePrompt.getOptions(), this.defaultOptions);
 
-		XinHuoImageApi.QianFanImageRequest imageRequest = createRequest(imagePrompt, requestImageOptions);
+		XingHuoImageApi.QianFanImageRequest imageRequest = createRequest(imagePrompt, requestImageOptions);
 
 		var observationContext = ImageModelObservationContext.builder()
 			.imagePrompt(imagePrompt)
-			.provider(XinHuoConstants.PROVIDER_NAME)
+			.provider(XingHuoConstants.PROVIDER_NAME)
 			.requestOptions(requestImageOptions)
 			.build();
 
@@ -150,7 +150,7 @@ public class XinHuoImageModel implements ImageModel {
 					this.observationRegistry)
 			.observe(() -> {
 
-				ResponseEntity<XinHuoImageApi.QianFanImageResponse> imageResponseEntity = this.retryTemplate
+				ResponseEntity<XingHuoImageApi.QianFanImageResponse> imageResponseEntity = this.retryTemplate
 					.execute(ctx -> this.xinHuoImageApi.createImage(imageRequest));
 
 				ImageResponse imageResponse = convertResponse(imageResponseEntity, imageRequest);
@@ -161,19 +161,19 @@ public class XinHuoImageModel implements ImageModel {
 			});
 	}
 
-	private XinHuoImageApi.QianFanImageRequest createRequest(ImagePrompt imagePrompt,
-			XinHuoImageOptions requestImageOptions) {
+	private XingHuoImageApi.QianFanImageRequest createRequest(ImagePrompt imagePrompt,
+			XingHuoImageOptions requestImageOptions) {
 		String instructions = imagePrompt.getInstructions().get(0).getText();
 
-		XinHuoImageApi.QianFanImageRequest imageRequest = new XinHuoImageApi.QianFanImageRequest(instructions,
-				XinHuoImageApi.DEFAULT_IMAGE_MODEL);
+		XingHuoImageApi.QianFanImageRequest imageRequest = new XingHuoImageApi.QianFanImageRequest(instructions,
+				XingHuoImageApi.DEFAULT_IMAGE_MODEL);
 
-		return ModelOptionsUtils.merge(requestImageOptions, imageRequest, XinHuoImageApi.QianFanImageRequest.class);
+		return ModelOptionsUtils.merge(requestImageOptions, imageRequest, XingHuoImageApi.QianFanImageRequest.class);
 	}
 
-	private ImageResponse convertResponse(ResponseEntity<XinHuoImageApi.QianFanImageResponse> imageResponseEntity,
-			XinHuoImageApi.QianFanImageRequest qianFanImageRequest) {
-		XinHuoImageApi.QianFanImageResponse imageApiResponse = imageResponseEntity.getBody();
+	private ImageResponse convertResponse(ResponseEntity<XingHuoImageApi.QianFanImageResponse> imageResponseEntity,
+										  XingHuoImageApi.QianFanImageRequest qianFanImageRequest) {
+		XingHuoImageApi.QianFanImageResponse imageApiResponse = imageResponseEntity.getBody();
 		if (imageApiResponse == null) {
 			logger.warn("No image response returned for request: {}", qianFanImageRequest);
 			return new ImageResponse(List.of());
@@ -188,21 +188,21 @@ public class XinHuoImageModel implements ImageModel {
 	}
 
 	/**
-	 * Convert the {@link ImageOptions} into {@link XinHuoImageOptions}.
+	 * Convert the {@link ImageOptions} into {@link XingHuoImageOptions}.
 	 * @param runtimeImageOptions the image options to use.
 	 * @param defaultOptions the default options.
-	 * @return the converted {@link XinHuoImageOptions}.
+	 * @return the converted {@link XingHuoImageOptions}.
 	 */
-	private XinHuoImageOptions mergeOptions(@Nullable ImageOptions runtimeImageOptions,
-			XinHuoImageOptions defaultOptions) {
+	private XingHuoImageOptions mergeOptions(@Nullable ImageOptions runtimeImageOptions,
+											 XingHuoImageOptions defaultOptions) {
 		var runtimeOptionsForProvider = ModelOptionsUtils.copyToTarget(runtimeImageOptions, ImageOptions.class,
-				XinHuoImageOptions.class);
+				XingHuoImageOptions.class);
 
 		if (runtimeOptionsForProvider == null) {
 			return defaultOptions;
 		}
 
-		return XinHuoImageOptions.builder()
+		return XingHuoImageOptions.builder()
 			.withModel(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getModel(), defaultOptions.getModel()))
 			.withN(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getN(), defaultOptions.getN()))
 			.withModel(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getModel(), defaultOptions.getModel()))

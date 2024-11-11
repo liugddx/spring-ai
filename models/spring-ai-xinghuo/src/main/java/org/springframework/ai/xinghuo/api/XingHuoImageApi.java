@@ -34,7 +34,7 @@ import org.springframework.web.client.RestClient;
  * @author Geng Rong
  * @since 1.0
  */
-public class XinHuoImageApi extends AuthApi {
+public class XingHuoImageApi extends AuthApi {
 
 	public static final String DEFAULT_IMAGE_MODEL = ImageModel.Stable_Diffusion_XL.getValue();
 
@@ -45,8 +45,8 @@ public class XinHuoImageApi extends AuthApi {
 	 * @param apiKey QianFan api key.
 	 * @param secretKey QianFan secret key.
 	 */
-	public XinHuoImageApi(String apiKey, String secretKey) {
-		this(XinHuoConstants.DEFAULT_BASE_URL, apiKey, secretKey, RestClient.builder());
+	public XingHuoImageApi(String apiKey, String secretKey) {
+		this(XingHuoConstants.DEFAULT_BASE_URL, apiKey, secretKey, RestClient.builder());
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class XinHuoImageApi extends AuthApi {
 	 * @param secretKey QianFan secret key.
 	 * @param restClientBuilder the rest client builder to use.
 	 */
-	public XinHuoImageApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder) {
+	public XingHuoImageApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder) {
 		this(baseUrl, apiKey, secretKey, restClientBuilder, RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
 
@@ -68,12 +68,12 @@ public class XinHuoImageApi extends AuthApi {
 	 * @param restClientBuilder the rest client builder to use.
 	 * @param responseErrorHandler the response error handler to use.
 	 */
-	public XinHuoImageApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder,
-			ResponseErrorHandler responseErrorHandler) {
+	public XingHuoImageApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder,
+						   ResponseErrorHandler responseErrorHandler) {
 		super(apiKey, secretKey);
 
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
-			.defaultHeaders(XinHuoUtils.defaultHeaders())
+			.defaultHeaders(XingHuoUtils.defaultHeaders())
 			.defaultStatusHandler(responseErrorHandler)
 			.build();
 	}

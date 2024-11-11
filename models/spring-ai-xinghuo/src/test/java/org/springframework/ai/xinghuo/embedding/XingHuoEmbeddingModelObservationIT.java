@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.embedding;
+package org.springframework.ai.xinghuo.embedding;
 
 import java.util.List;
 
@@ -31,8 +31,8 @@ import org.springframework.ai.embedding.EmbeddingResponseMetadata;
 import org.springframework.ai.embedding.observation.DefaultEmbeddingModelObservationConvention;
 import org.springframework.ai.observation.conventions.AiOperationType;
 import org.springframework.ai.observation.conventions.AiProvider;
-import org.springframework.ai.qianfan.XinHuoEmbeddingModel;
-import org.springframework.ai.qianfan.XinHuoEmbeddingOptions;
+import org.springframework.ai.qianfan.XingHuoEmbeddingModel;
+import org.springframework.ai.qianfan.XingHuoEmbeddingOptions;
 import org.springframework.ai.qianfan.api.XinHuoApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -45,24 +45,24 @@ import static org.springframework.ai.embedding.observation.EmbeddingModelObserva
 import static org.springframework.ai.embedding.observation.EmbeddingModelObservationDocumentation.LowCardinalityKeyNames;
 
 /**
- * Integration tests for observation instrumentation in {@link XinHuoEmbeddingModel}.
+ * Integration tests for observation instrumentation in {@link XingHuoEmbeddingModel}.
  *
  * @author Geng Rong
  */
-@SpringBootTest(classes = XinHuoEmbeddingModelObservationIT.Config.class)
+@SpringBootTest(classes = XingHuoEmbeddingModelObservationIT.Config.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-public class XinHuoEmbeddingModelObservationIT {
+public class XingHuoEmbeddingModelObservationIT {
 
 	@Autowired
 	TestObservationRegistry observationRegistry;
 
 	@Autowired
-	XinHuoEmbeddingModel embeddingModel;
+	XingHuoEmbeddingModel embeddingModel;
 
 	@Test
 	void observationForEmbeddingOperation() {
-		var options = XinHuoEmbeddingOptions.builder()
+		var options = XingHuoEmbeddingOptions.builder()
 			.withModel(XinHuoApi.EmbeddingModel.BGE_LARGE_ZH.getValue())
 			.build();
 
@@ -107,9 +107,9 @@ public class XinHuoEmbeddingModelObservationIT {
 		}
 
 		@Bean
-		public XinHuoEmbeddingModel qianFanEmbeddingModel(XinHuoApi xinHuoApi,
-				TestObservationRegistry observationRegistry) {
-			return new XinHuoEmbeddingModel(xinHuoApi, MetadataMode.EMBED, XinHuoEmbeddingOptions.builder().build(),
+		public XingHuoEmbeddingModel qianFanEmbeddingModel(XinHuoApi xinHuoApi,
+														   TestObservationRegistry observationRegistry) {
+			return new XingHuoEmbeddingModel(xinHuoApi, MetadataMode.EMBED, XingHuoEmbeddingOptions.builder().build(),
 					RetryTemplate.defaultInstance(), observationRegistry);
 		}
 

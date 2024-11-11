@@ -31,7 +31,7 @@ import org.springframework.ai.embedding.EmbeddingOptions;
  * @since 1.0
  */
 @JsonInclude(Include.NON_NULL)
-public class XinHuoEmbeddingOptions implements EmbeddingOptions {
+public class XingHuoEmbeddingOptions implements EmbeddingOptions {
 
 	// @formatter:off
 	/**
@@ -75,10 +75,10 @@ public class XinHuoEmbeddingOptions implements EmbeddingOptions {
 
 	public static class Builder {
 
-		protected XinHuoEmbeddingOptions options;
+		protected XingHuoEmbeddingOptions options;
 
 		public Builder() {
-			this.options = new XinHuoEmbeddingOptions();
+			this.options = new XingHuoEmbeddingOptions();
 		}
 
 		public Builder withModel(String model) {
@@ -91,7 +91,7 @@ public class XinHuoEmbeddingOptions implements EmbeddingOptions {
 			return this;
 		}
 
-		public XinHuoEmbeddingOptions build() {
+		public XingHuoEmbeddingOptions build() {
 			return this.options;
 		}
 

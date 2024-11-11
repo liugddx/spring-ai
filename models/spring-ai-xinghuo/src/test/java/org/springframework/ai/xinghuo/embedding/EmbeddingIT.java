@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.embedding;
+package org.springframework.ai.xinghuo.embedding;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
 
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
-import org.springframework.ai.qianfan.QianFanTestConfiguration;
+import org.springframework.ai.qianfan.XingHuoTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Geng Rong
  */
-@SpringBootTest(classes = QianFanTestConfiguration.class)
+@SpringBootTest(classes = XingHuoTestConfiguration.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
 class EmbeddingIT {

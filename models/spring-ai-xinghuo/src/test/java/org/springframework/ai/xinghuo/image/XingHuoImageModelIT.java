@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan.image;
+package org.springframework.ai.xinghuo.image;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -26,7 +26,7 @@ import org.springframework.ai.image.ImageOptionsBuilder;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.image.ImageResponseMetadata;
-import org.springframework.ai.qianfan.QianFanTestConfiguration;
+import org.springframework.ai.qianfan.XingHuoTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -35,10 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Geng Rong
  */
-@SpringBootTest(classes = QianFanTestConfiguration.class)
+@SpringBootTest(classes = XingHuoTestConfiguration.class)
 @EnabledIfEnvironmentVariables({ @EnabledIfEnvironmentVariable(named = "QIANFAN_API_KEY", matches = ".+"),
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
-public class QianFanImageModelIT {
+public class XingHuoImageModelIT {
 
 	@Autowired
 	protected ImageModel imageModel;

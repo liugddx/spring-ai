@@ -42,7 +42,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Guangdong Liu
  * @since 1.0
  */
-public class XinHuoApi extends AuthApi {
+public class XingHuoApi extends AuthApi {
 
 	public static final String DEFAULT_CHAT_MODEL = ChatModel.ERNIE_Speed_8K.getValue();
 	public static final String DEFAULT_EMBEDDING_MODEL = EmbeddingModel.BGE_LARGE_ZH.getValue();
@@ -59,8 +59,8 @@ public class XinHuoApi extends AuthApi {
 	 * @param apiKey QianFan api key.
 	 * @param secretKey QianFan secret key.
 	 */
-	public XinHuoApi(String apiKey, String secretKey) {
-		this(XinHuoConstants.DEFAULT_BASE_URL, apiKey, secretKey);
+	public XingHuoApi(String apiKey, String secretKey) {
+		this(XingHuoConstants.DEFAULT_BASE_URL, apiKey, secretKey);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class XinHuoApi extends AuthApi {
 	 * @param apiKey QianFan api key.
 	 * @param secretKey QianFan secret key.
 	 */
-	public XinHuoApi(String baseUrl, String apiKey, String secretKey) {
+	public XingHuoApi(String baseUrl, String apiKey, String secretKey) {
 		this(baseUrl, apiKey, secretKey, RestClient.builder());
 	}
 
@@ -82,7 +82,7 @@ public class XinHuoApi extends AuthApi {
 	 * @param secretKey QianFan secret key.
 	 * @param restClientBuilder RestClient builder.
 	 */
-	public XinHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder) {
+	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder) {
 		this(baseUrl, apiKey, secretKey, restClientBuilder, RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
 
@@ -95,7 +95,7 @@ public class XinHuoApi extends AuthApi {
 	 * @param restClientBuilder RestClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public XinHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
+	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 		this(baseUrl, apiKey, secretKey, restClientBuilder, WebClient.builder(), responseErrorHandler);
 	}
 
@@ -109,19 +109,18 @@ public class XinHuoApi extends AuthApi {
 	 * @param webClientBuilder     WebClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public XinHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder,
-					WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
-		super(apiKey, secretKey);
+	public XingHuoApi(String baseUrl, String apiKey, String secretKey, RestClient.Builder restClientBuilder,
+					  WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
 
 		this.restClient = restClientBuilder
 				.baseUrl(baseUrl)
-				.defaultHeaders(XinHuoUtils.defaultHeaders())
+				.defaultHeaders(XingHuoUtils.defaultHeaders())
 				.defaultStatusHandler(responseErrorHandler)
 				.build();
 
 		this.webClient = webClientBuilder
 				.baseUrl(baseUrl)
-				.defaultHeaders(XinHuoUtils.defaultHeaders())
+				.defaultHeaders(XingHuoUtils.defaultHeaders())
 				.build();
 	}
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.ai.qianfan;
+package org.springframework.ai.xinghuo;
 
 import java.util.List;
 
@@ -35,11 +35,11 @@ import org.springframework.ai.embedding.observation.EmbeddingModelObservationCon
 import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
 import org.springframework.ai.embedding.observation.EmbeddingModelObservationDocumentation;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.qianfan.api.XinHuoApi;
-import org.springframework.ai.qianfan.api.XinHuoApi.EmbeddingList;
-import org.springframework.ai.qianfan.api.XinHuoConstants;
-import org.springframework.ai.qianfan.metadata.XinHuoUsage;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
+import org.springframework.ai.xinghuo.api.XingHuoConstants;
+import org.springframework.ai.xinghuo.api.XingHuoApi.EmbeddingList;
+import org.springframework.ai.xinghuo.metadata.XingHuoUsage;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
@@ -51,17 +51,17 @@ import org.springframework.util.Assert;
  * @author Thomas Vitale
  * @since 1.0
  */
-public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
+public class XingHuoEmbeddingModel extends AbstractEmbeddingModel {
 
-	private static final Logger logger = LoggerFactory.getLogger(XinHuoEmbeddingModel.class);
+	private static final Logger logger = LoggerFactory.getLogger(XingHuoEmbeddingModel.class);
 
 	private static final EmbeddingModelObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultEmbeddingModelObservationConvention();
 
-	private final org.springframework.ai.qianfan.XinHuoEmbeddingOptions defaultOptions;
+	private final org.springframework.ai.qianfan.XingHuoEmbeddingOptions defaultOptions;
 
 	private final RetryTemplate retryTemplate;
 
-	private final XinHuoApi xinHuoApi;
+	private final XingHuoApi XingHuoApi;
 
 	private final MetadataMode metadataMode;
 
@@ -77,62 +77,62 @@ public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
 
 	/**
 	 * Constructor for the QianFanEmbeddingModel class.
-	 * @param xinHuoApi The QianFanApi instance to use for making API requests.
+	 * @param xingHuoApi The QianFanApi instance to use for making API requests.
 	 */
-	public XinHuoEmbeddingModel(XinHuoApi xinHuoApi) {
-		this(xinHuoApi, MetadataMode.EMBED);
+	public XingHuoEmbeddingModel(XingHuoApi xingHuoApi) {
+		this(xingHuoApi, MetadataMode.EMBED);
 	}
 
 	/**
 	 * Initializes a new instance of the QianFanEmbeddingModel class.
-	 * @param xinHuoApi The QianFanApi instance to use for making API requests.
+	 * @param XingHuoApi The QianFanApi instance to use for making API requests.
 	 * @param metadataMode The mode for generating metadata.
 	 */
-	public XinHuoEmbeddingModel(XinHuoApi xinHuoApi, MetadataMode metadataMode) {
-		this(xinHuoApi, metadataMode,
-				org.springframework.ai.qianfan.XinHuoEmbeddingOptions.builder().withModel(XinHuoApi.DEFAULT_EMBEDDING_MODEL).build());
+	public XingHuoEmbeddingModel(XingHuoApi XingHuoApi, MetadataMode metadataMode) {
+		this(XingHuoApi, metadataMode,
+				org.springframework.ai.qianfan.XingHuoEmbeddingOptions.builder().withModel(XingHuoApi.DEFAULT_EMBEDDING_MODEL).build());
 	}
 
 	/**
 	 * Initializes a new instance of the QianFanEmbeddingModel class.
-	 * @param xinHuoApi The QianFanApi instance to use for making API requests.
+	 * @param XingHuoApi The QianFanApi instance to use for making API requests.
 	 * @param metadataMode The mode for generating metadata.
-	 * @param xinHuoEmbeddingOptions The options for QianFan embedding.
+	 * @param xingHuoEmbeddingOptions The options for QianFan embedding.
 	 */
-	public XinHuoEmbeddingModel(XinHuoApi xinHuoApi, MetadataMode metadataMode,
-			org.springframework.ai.qianfan.XinHuoEmbeddingOptions xinHuoEmbeddingOptions) {
-		this(xinHuoApi, metadataMode, xinHuoEmbeddingOptions, RetryUtils.DEFAULT_RETRY_TEMPLATE);
+	public XingHuoEmbeddingModel(XingHuoApi XingHuoApi, MetadataMode metadataMode,
+                                 org.springframework.ai.qianfan.XingHuoEmbeddingOptions xingHuoEmbeddingOptions) {
+		this(XingHuoApi, metadataMode, xingHuoEmbeddingOptions, RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
 	/**
 	 * Initializes a new instance of the QianFanEmbeddingModel class.
-	 * @param xinHuoApi The QianFanApi instance to use for making API requests.
+	 * @param XingHuoApi The QianFanApi instance to use for making API requests.
 	 * @param metadataMode The mode for generating metadata.
-	 * @param xinHuoEmbeddingOptions The options for QianFan embedding.
+	 * @param xingHuoEmbeddingOptions The options for QianFan embedding.
 	 * @param retryTemplate - The RetryTemplate for retrying failed API requests.
 	 */
-	public XinHuoEmbeddingModel(XinHuoApi xinHuoApi, MetadataMode metadataMode,
-			org.springframework.ai.qianfan.XinHuoEmbeddingOptions xinHuoEmbeddingOptions, RetryTemplate retryTemplate) {
-		this(xinHuoApi, metadataMode, xinHuoEmbeddingOptions, retryTemplate, ObservationRegistry.NOOP);
+	public XingHuoEmbeddingModel(XingHuoApi XingHuoApi, MetadataMode metadataMode,
+								 org.springframework.ai.qianfan.XingHuoEmbeddingOptions xingHuoEmbeddingOptions, RetryTemplate retryTemplate) {
+		this(XingHuoApi, metadataMode, xingHuoEmbeddingOptions, retryTemplate, ObservationRegistry.NOOP);
 	}
 
 	/**
 	 * Initializes a new instance of the QianFanEmbeddingModel class.
-	 * @param xinHuoApi - The QianFanApi instance to use for making API requests.
+	 * @param XingHuoApi - The QianFanApi instance to use for making API requests.
 	 * @param metadataMode - The mode for generating metadata.
 	 * @param options - The options for QianFan embedding.
 	 * @param retryTemplate - The RetryTemplate for retrying failed API requests.
 	 * @param observationRegistry - The ObservationRegistry used for instrumentation.
 	 */
-	public XinHuoEmbeddingModel(XinHuoApi xinHuoApi, MetadataMode metadataMode, org.springframework.ai.qianfan.XinHuoEmbeddingOptions options,
-			RetryTemplate retryTemplate, ObservationRegistry observationRegistry) {
-		Assert.notNull(xinHuoApi, "QianFanApi must not be null");
+	public XingHuoEmbeddingModel(XingHuoApi XingHuoApi, MetadataMode metadataMode, org.springframework.ai.qianfan.XingHuoEmbeddingOptions options,
+                                 RetryTemplate retryTemplate, ObservationRegistry observationRegistry) {
+		Assert.notNull(XingHuoApi, "QianFanApi must not be null");
 		Assert.notNull(metadataMode, "metadataMode must not be null");
 		Assert.notNull(options, "options must not be null");
 		Assert.notNull(retryTemplate, "retryTemplate must not be null");
 		Assert.notNull(observationRegistry, "observationRegistry must not be null");
 
-		this.xinHuoApi = xinHuoApi;
+		this.XingHuoApi = XingHuoApi;
 		this.metadataMode = metadataMode;
 		this.defaultOptions = options;
 		this.retryTemplate = retryTemplate;
@@ -147,13 +147,13 @@ public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
 
 	@Override
 	public EmbeddingResponse call(EmbeddingRequest request) {
-		org.springframework.ai.qianfan.XinHuoEmbeddingOptions requestOptions = mergeOptions(request.getOptions(), this.defaultOptions);
-		XinHuoApi.EmbeddingRequest apiRequest = new XinHuoApi.EmbeddingRequest(request.getInstructions(),
+		org.springframework.ai.qianfan.XingHuoEmbeddingOptions requestOptions = mergeOptions(request.getOptions(), this.defaultOptions);
+		XingHuoApi.EmbeddingRequest apiRequest = new XingHuoApi.EmbeddingRequest(request.getInstructions(),
 				requestOptions.getModel(), requestOptions.getUser());
 
 		var observationContext = EmbeddingModelObservationContext.builder()
 			.embeddingRequest(request)
-			.provider(XinHuoConstants.PROVIDER_NAME)
+			.provider(XingHuoConstants.PROVIDER_NAME)
 			.requestOptions(requestOptions)
 			.build();
 
@@ -162,7 +162,7 @@ public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
 					this.observationRegistry)
 			.observe(() -> {
 				EmbeddingList apiEmbeddingResponse = this.retryTemplate
-					.execute(ctx -> this.xinHuoApi.embeddings(apiRequest).getBody());
+					.execute(ctx -> this.XingHuoApi.embeddings(apiRequest).getBody());
 
 				if (apiEmbeddingResponse == null) {
 					logger.warn("No embeddings returned for request: {}", request);
@@ -176,7 +176,7 @@ public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
 				}
 
 				var metadata = new EmbeddingResponseMetadata(apiRequest.model(),
-						XinHuoUsage.from(apiEmbeddingResponse.usage()));
+						XingHuoUsage.from(apiEmbeddingResponse.usage()));
 
 				List<Embedding> embeddings = apiEmbeddingResponse.data()
 					.stream()
@@ -196,16 +196,16 @@ public class XinHuoEmbeddingModel extends AbstractEmbeddingModel {
 	 * Merge runtime and default {@link EmbeddingOptions} to compute the final options to
 	 * use in the request.
 	 */
-	private org.springframework.ai.qianfan.XinHuoEmbeddingOptions mergeOptions(@Nullable EmbeddingOptions runtimeOptions,
-			org.springframework.ai.qianfan.XinHuoEmbeddingOptions defaultOptions) {
+	private org.springframework.ai.qianfan.XingHuoEmbeddingOptions mergeOptions(@Nullable EmbeddingOptions runtimeOptions,
+																				org.springframework.ai.qianfan.XingHuoEmbeddingOptions defaultOptions) {
 		var runtimeOptionsForProvider = ModelOptionsUtils.copyToTarget(runtimeOptions, EmbeddingOptions.class,
-				org.springframework.ai.qianfan.XinHuoEmbeddingOptions.class);
+				org.springframework.ai.qianfan.XingHuoEmbeddingOptions.class);
 
 		if (runtimeOptionsForProvider == null) {
 			return defaultOptions;
 		}
 
-		return org.springframework.ai.qianfan.XinHuoEmbeddingOptions.builder()
+		return org.springframework.ai.qianfan.XingHuoEmbeddingOptions.builder()
 			.withModel(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getModel(), defaultOptions.getModel()))
 			.withUser(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getUser(), defaultOptions.getUser()))
 			.build();
