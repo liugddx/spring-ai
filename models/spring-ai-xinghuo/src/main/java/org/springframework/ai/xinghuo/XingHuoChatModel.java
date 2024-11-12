@@ -25,6 +25,7 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.xinghuo.metadata.XingHuoUsage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +47,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.xinghuo.api.XingHuoApi;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletion;
-import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionChunk;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage.Role;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionRequest;
@@ -60,7 +60,7 @@ import org.springframework.util.Assert;
  * {@link ChatModel} and {@link StreamingChatModel} implementation for {@literal XingHuo}
  * backed by {@link XingHuoApi}.
  *
- * @author Geng Rong
+ * @author Guangdong Liu
  * @see ChatModel
  * @see StreamingChatModel
  * @see XingHuoApi
@@ -175,7 +175,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 
 			// @formatter:off
 					Map<String, Object> metadata = Map.of(
-						"id", chatCompletion.id(),
+						"id", chatCompletion.sid(),
 						"role", Role.ASSISTANT
 					);
 					// @formatter:on
@@ -230,16 +230,6 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	}
 
 	/**
-	 * Convert the ChatCompletionChunk into a ChatCompletion.
-	 * @param chunk the ChatCompletionChunk to convert
-	 * @return the ChatCompletion
-	 */
-	private ChatCompletion toChatCompletion(ChatCompletionChunk chunk) {
-		return new ChatCompletion(chunk.id(), chunk.object(), chunk.created(), chunk.result(), chunk.finishReason(),
-				chunk.usage());
-	}
-
-	/**
 	 * Accessible for testing.
 	 */
 	public ChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
@@ -282,7 +272,6 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 			.withFrequencyPenalty(request.frequencyPenalty())
 			.withMaxTokens(request.maxTokens())
 			.withPresencePenalty(request.presencePenalty())
-			.withStopSequences(request.stop())
 			.withTemperature(request.temperature())
 			.withTopP(request.topP())
 			.build();

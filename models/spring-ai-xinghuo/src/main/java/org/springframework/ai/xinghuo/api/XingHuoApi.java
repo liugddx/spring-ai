@@ -112,7 +112,7 @@ public class XingHuoApi extends AuthApi {
 	}
 
 	/**
-	 * QianFan Chat Completion Models:
+	 * XingHuo Chat Completion Models:
 	 * <a href="https://xinghuo.xfyun.cn/sparkapi">XingHuo Model</a>.
 	 */
 	public enum ChatModel {
@@ -238,6 +238,152 @@ public class XingHuoApi extends AuthApi {
 			@JsonProperty("tool_choice") Object toolChoice
 	)
 	{
+
+		/**
+		 * Primary constructor with validation for required fields.
+		 */
+		public ChatCompletionRequest {
+			if (model == null || model.isBlank()) {
+				throw new IllegalArgumentException("Model is required and cannot be null or blank.");
+			}
+			if (messages == null || messages.isEmpty()) {
+				throw new IllegalArgumentException("Messages are required and cannot be null or empty.");
+			}
+		}
+
+		/**
+		 *
+		 * @param model       Specifies the model version to access.
+		 * @param messages    Array of input messages.
+		 */
+		public ChatCompletionRequest(String model, List<ChatCompletionMessage> messages) {
+			this(model, null, messages, null, null, null, null, null, null, null, null, null, null);
+		}
+
+		/**
+		 *
+		 * @param model       Specifies the model version to access.
+		 * @param messages    Array of input messages.
+		 * @param temperature Sampling threshold.
+		 */
+		public ChatCompletionRequest(String model, List<ChatCompletionMessage> messages, Double temperature) {
+			this(model, null, messages, temperature, null, null, null, null, null, null, null, null, null);
+		}
+
+		/**
+		 * Builder static inner class.
+		 */
+		public static class Builder {
+			private final String model;
+			private final List<ChatCompletionMessage> messages;
+
+			private String user = null;
+			private Double temperature = null;
+			private Double topP = null;
+			private Integer topK = null;
+			private Double presencePenalty = null;
+			private Double frequencyPenalty = null;
+			private Boolean stream = null;
+			private Integer maxTokens = null;
+			private ResponseFormat responseFormat = null;
+			private List<Tool> tools = null;
+			private Object toolChoice = null;
+
+			/**
+			 * Builder constructor with required fields.
+			 *
+			 * @param model    Specifies the model version to access.
+			 * @param messages Array of input messages.
+			 */
+			public Builder(String model, List<ChatCompletionMessage> messages) {
+				if (model == null || model.isBlank()) {
+					throw new IllegalArgumentException("Model is required and cannot be null or blank.");
+				}
+				if (messages == null || messages.isEmpty()) {
+					throw new IllegalArgumentException("Messages are required and cannot be null or empty.");
+				}
+				this.model = model;
+				this.messages = messages;
+			}
+
+			public Builder user(String user) {
+				this.user = user;
+				return this;
+			}
+
+			public Builder temperature(Double temperature) {
+				this.temperature = temperature;
+				return this;
+			}
+
+			public Builder topP(Double topP) {
+				this.topP = topP;
+				return this;
+			}
+
+			public Builder topK(Integer topK) {
+				this.topK = topK;
+				return this;
+			}
+
+			public Builder presencePenalty(Double presencePenalty) {
+				this.presencePenalty = presencePenalty;
+				return this;
+			}
+
+			public Builder frequencyPenalty(Double frequencyPenalty) {
+				this.frequencyPenalty = frequencyPenalty;
+				return this;
+			}
+
+			public Builder stream(Boolean stream) {
+				this.stream = stream;
+				return this;
+			}
+
+			public Builder maxTokens(Integer maxTokens) {
+				this.maxTokens = maxTokens;
+				return this;
+			}
+
+			public Builder responseFormat(ResponseFormat responseFormat) {
+				this.responseFormat = responseFormat;
+				return this;
+			}
+
+			public Builder tools(List<Tool> tools) {
+				this.tools = tools;
+				return this;
+			}
+
+			public Builder toolChoice(Object toolChoice) {
+				this.toolChoice = toolChoice;
+				return this;
+			}
+
+			/**
+			 * Builds and returns the ChatCompletionRequest instance.
+			 *
+			 * @return A new instance of ChatCompletionRequest.
+			 */
+			public ChatCompletionRequest build() {
+				return new ChatCompletionRequest(
+						model,
+						user,
+						messages,
+						temperature,
+						topP,
+						topK,
+						presencePenalty,
+						frequencyPenalty,
+						stream,
+						maxTokens,
+						responseFormat,
+						tools,
+						toolChoice
+				);
+			}
+		}
 
 		/**
 		 * Represents the response format.
@@ -380,6 +526,16 @@ public class XingHuoApi extends AuthApi {
 			  Unique identifier for this request.
 			 */
 			@JsonProperty("sid") String sid,
+
+			/*
+			  Unique identifier for this request.
+			 */
+			@JsonProperty("id") String id,
+
+			/*
+			  The Unix timestamp (in seconds) of when the chat completion was created.
+			 */
+			@JsonProperty("created") Long created,
 
 			/*
 			  Array of model results.

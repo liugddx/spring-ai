@@ -17,7 +17,6 @@
 package org.springframework.ai.xinghuo.aot;
 
 import org.springframework.ai.xinghuo.api.XingHuoApi;
-import org.springframework.ai.xinghuo.api.XingHuoImageApi;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -30,7 +29,7 @@ import static org.springframework.ai.aot.AiRuntimeHints.findJsonAnnotatedClasses
  * The XingHuoRuntimeHints class is responsible for registering runtime hints for XingHuo
  * API classes.
  *
- * @author Geng Rong
+ * @author Guangdong Liu
  */
 public class XingHuoRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -38,9 +37,6 @@ public class XingHuoRuntimeHints implements RuntimeHintsRegistrar {
 	public void registerHints(@NonNull RuntimeHints hints, @Nullable ClassLoader classLoader) {
 		var mcs = MemberCategory.values();
 		for (var tr : findJsonAnnotatedClassesInPackage(XingHuoApi.class)) {
-			hints.reflection().registerType(tr, mcs);
-		}
-		for (var tr : findJsonAnnotatedClassesInPackage(XingHuoImageApi.class)) {
 			hints.reflection().registerType(tr, mcs);
 		}
 	}

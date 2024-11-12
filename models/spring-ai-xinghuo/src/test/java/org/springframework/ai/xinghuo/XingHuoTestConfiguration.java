@@ -16,16 +16,13 @@
 
 package org.springframework.ai.xinghuo;
 
-import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.xinghuo.api.XingHuoApi;
-import org.springframework.ai.xinghuo.api.XingHuoImageApi;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
 
 /**
- * @author Geng Rong
+ * @author Guangdong Liu
  */
 @SpringBootConfiguration
 public class XingHuoTestConfiguration {
@@ -33,11 +30,6 @@ public class XingHuoTestConfiguration {
 	@Bean
 	public XingHuoApi XingHuoApi() {
 		return new XingHuoApi(getApiKey(), getSecretKey());
-	}
-
-	@Bean
-	public XingHuoImageApi XingHuoImageApi() {
-		return new XingHuoImageApi(getApiKey(), getSecretKey());
 	}
 
 	private String getApiKey() {
