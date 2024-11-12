@@ -27,18 +27,18 @@ import org.springframework.util.Assert;
  */
 public class XingHuoUsage implements Usage {
 
-	private final XingHuoApi.Usage usage;
+	private final XingHuoApi.ChatCompletion.Usage usage;
 
-	protected XingHuoUsage(XingHuoApi.Usage usage) {
+	protected XingHuoUsage(XingHuoApi.ChatCompletion.Usage usage) {
 		Assert.notNull(usage, "XingHuo Usage must not be null");
 		this.usage = usage;
 	}
 
-	public static XingHuoUsage from(XingHuoApi.Usage usage) {
+	public static XingHuoUsage from(XingHuoApi.ChatCompletion.Usage usage) {
 		return new XingHuoUsage(usage);
 	}
 
-	protected XingHuoApi.Usage getUsage() {
+	protected XingHuoApi.ChatCompletion.Usage getUsage() {
 		return this.usage;
 	}
 
