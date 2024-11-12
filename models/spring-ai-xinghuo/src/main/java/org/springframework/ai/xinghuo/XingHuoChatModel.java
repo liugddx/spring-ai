@@ -16,18 +16,15 @@
 
 package org.springframework.ai.xinghuo;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletion.Choice;
 import org.springframework.ai.xinghuo.metadata.XingHuoUsage;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
@@ -35,7 +32,6 @@ import org.springframework.ai.chat.metadata.EmptyUsage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.model.MessageAggregator;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.observation.ChatModelObservationContext;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
@@ -152,7 +148,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	@Override
 	public ChatResponse call(Prompt prompt) {
 
-		ChatCompletionRequest request = createRequest(prompt, false);
+		ChatCompletionRequest request = createRequest(prompt.getOptions().getModel(),prompt, false);
 
 		ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 			.prompt(prompt)
@@ -168,21 +164,34 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 					.execute(ctx -> this.xingHuoApi.chatCompletionEntity(request));
 
 				var chatCompletion = completionEntity.getBody();
+
 				if (chatCompletion == null) {
 					logger.warn("No chat completion returned for prompt: {}", prompt);
 					return new ChatResponse(List.of());
 				}
 
-			// @formatter:off
-					Map<String, Object> metadata = Map.of(
-						"id", chatCompletion.sid(),
-						"role", Role.ASSISTANT
-					);
-					// @formatter:on
+				List<Choice> choices = chatCompletion.choices();
+				if (choices == null) {
+					logger.warn("No choices returned for prompt: {}, because: {}}", prompt,
+							chatCompletion.message());
+					return new ChatResponse(List.of());
+				}
 
-				var assistantMessage = new AssistantMessage(chatCompletion.result(), metadata);
-				List<Generation> generations = Collections.singletonList(new Generation(assistantMessage));
-				ChatResponse chatResponse = new ChatResponse(generations, from(chatCompletion, request.model()));
+				List<Generation> generations = choices.stream().map(choice -> {
+					// @formatter:off
+					// if the choice is a web search tool call, return last message of choice.messages
+					ChatCompletionMessage message = null;
+					if (choice.message() != null) {
+						message = choice.message();
+					}
+					Map<String, Object> metadata = Map.of(
+							"id", chatCompletion.id(),
+							"role", message != null && message.role() != null ? message.role().name() : "");
+					// @formatter:on
+					return new Generation(new AssistantMessage(choice.content(), metadata));
+				}).toList();
+
+				ChatResponse chatResponse = new ChatResponse(generations, from(completionEntity.getBody(),prompt.getOptions().getModel()));
 				observationContext.setResponse(chatResponse);
 				return chatResponse;
 			});
@@ -191,63 +200,27 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	@Override
 	public Flux<ChatResponse> stream(Prompt prompt) {
 
-		return Flux.deferContextual(contextView -> {
-			ChatCompletionRequest request = createRequest(prompt, true);
+		//todo
 
-			var completionChunks = this.xingHuoApi.chatCompletionStream(request);
-
-			final ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
-				.prompt(prompt)
-				.provider(XingHuoConstants.PROVIDER_NAME)
-				.requestOptions(buildRequestOptions(request))
-				.build();
-
-			Observation observation = ChatModelObservationDocumentation.CHAT_MODEL_OPERATION.observation(
-					this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
-					this.observationRegistry);
-
-			observation.parentObservation(contextView.getOrDefault(ObservationThreadLocalAccessor.KEY, null)).start();
-
-			Flux<ChatResponse> chatResponse = completionChunks.map(this::toChatCompletion)
-				.switchMap(chatCompletion -> Mono.just(chatCompletion).map(chatCompletion2 -> {
-				// @formatter:off
-						Map<String, Object> metadata = Map.of(
-								"id", chatCompletion.id(),
-								"role", Role.ASSISTANT
-						);
-						// @formatter:on
-
-					var assistantMessage = new AssistantMessage(chatCompletion.result(), metadata);
-					List<Generation> generations = Collections.singletonList(new Generation(assistantMessage));
-					return new ChatResponse(generations, from(chatCompletion, request.model()));
-				}))
-				.doOnError(observation::error)
-				.doFinally(s -> observation.stop())
-				.contextWrite(ctx -> ctx.put(ObservationThreadLocalAccessor.KEY, observation));
-			return new MessageAggregator().aggregate(chatResponse, observationContext::setResponse);
-
-		});
+		return null;
 	}
 
 	/**
 	 * Accessible for testing.
 	 */
-	public ChatCompletionRequest createRequest(Prompt prompt, boolean stream) {
+	public ChatCompletionRequest createRequest(String model,Prompt prompt, boolean stream) {
 		var chatCompletionMessages = prompt.getInstructions()
 			.stream()
 			.map(m -> new ChatCompletionMessage(m.getContent(),
 					ChatCompletionMessage.Role.valueOf(m.getMessageType().name())))
 			.toList();
 		var systemMessageList = chatCompletionMessages.stream().filter(msg -> msg.role() == Role.SYSTEM).toList();
-		var userMessageList = chatCompletionMessages.stream().filter(msg -> msg.role() != Role.SYSTEM).toList();
 
 		if (systemMessageList.size() > 1) {
 			throw new IllegalArgumentException("Only one system message is allowed in the prompt");
 		}
 
-		var systemMessage = systemMessageList.isEmpty() ? null : systemMessageList.get(0).content();
-
-		var request = new ChatCompletionRequest(userMessageList, systemMessage, stream);
+		var request = new ChatCompletionRequest(model,chatCompletionMessages, stream);
 
 		if (this.defaultOptions != null) {
 			request = ModelOptionsUtils.merge(this.defaultOptions, request, ChatCompletionRequest.class);
