@@ -44,10 +44,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 public class XingHuoApi extends AuthApi {
 
-	public static final String DEFAULT_CHAT_MODEL = ChatModel.ERNIE_Speed_8K.getValue();
-	public static final String DEFAULT_EMBEDDING_MODEL = EmbeddingModel.BGE_LARGE_ZH.getValue();
-	private static final Predicate<ChatCompletionChunk> SSE_DONE_PREDICATE = ChatCompletionChunk::end;
-
+	public static final String DEFAULT_CHAT_MODEL = ChatModel.GENERAL_V_3_5.getValue();
 
 	private final RestClient restClient;
 
@@ -103,49 +100,20 @@ public class XingHuoApi extends AuthApi {
 	 * to true.
 	 * @return Returns a {@link Flux} stream from chat completion chunks.
 	 */
-	public Flux<ChatCompletionChunk> chatCompletionStream(ChatCompletionRequest chatRequest) {
+	public Flux<ChatCompletion> chatCompletionStream(ChatCompletionRequest chatRequest) {
 		Assert.notNull(chatRequest, "The request body can not be null.");
 		Assert.isTrue(chatRequest.stream(), "Request must set the stream property to true.");
 
 		return this.webClient.post()
-				.uri("/v1/wenxinworkshop/chat/{model}?access_token={token}", chatRequest.model, getAccessToken())
 				.body(Mono.just(chatRequest), ChatCompletionRequest.class)
 				.retrieve()
-				.bodyToFlux(ChatCompletionChunk.class)
-				.takeUntil(SSE_DONE_PREDICATE);
-	}
-
-	/**
-	 * Creates an embedding vector representing the input text or token array.
-	 * @param embeddingRequest The embedding request.
-	 * @return Returns list of {@link Embedding} wrapped in {@link EmbeddingList}.
-	 */
-	public ResponseEntity<EmbeddingList> embeddings(EmbeddingRequest embeddingRequest) {
-
-		Assert.notNull(embeddingRequest, "The request body can not be null.");
-
-		// Input text to embed, encoded as a string or array of tokens. To embed multiple
-		// inputs in a single
-		// request, pass an array of strings or array of token arrays.
-		Assert.notNull(embeddingRequest.texts(), "The input can not be null.");
-
-		// The input must not an empty string, and any array must be 16 dimensions or
-		// less.
-		Assert.isTrue(!CollectionUtils.isEmpty(embeddingRequest.texts()), "The input list can not be empty.");
-		Assert.isTrue(embeddingRequest.texts().size() <= 16, "The list must be 16 dimensions or less");
-
-		return this.restClient.post()
-				.uri("/v1/wenxinworkshop/embeddings/{model}?access_token={token}", embeddingRequest.model, getAccessToken())
-				.body(embeddingRequest)
-				.retrieve()
-				.toEntity(new ParameterizedTypeReference<>() {
-
-				});
+				.bodyToFlux(ChatCompletion.class)
+				.takeUntil(Predicate.not(chatCompletion -> chatCompletion.usage()!=null));
 	}
 
 	/**
 	 * QianFan Chat Completion Models:
-	 * <a href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu#%E5%AF%B9%E8%AF%9Dchat">QianFan Model</a>.
+	 * <a href="https://xinghuo.xfyun.cn/sparkapi">XingHuo Model</a>.
 	 */
 	public enum ChatModel {
 		LITE("lite"),
@@ -158,43 +126,6 @@ public class XingHuoApi extends AuthApi {
 		public final String  value;
 
 		ChatModel(String value) {
-			this.value = value;
-		}
-
-		public String getValue() {
-			return this.value;
-		}
-	}
-
-	/**
-	 * QianFan Embeddings Models:
-	 * <a href="https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Nlks5zkzu#%E5%90%91%E9%87%8Fembeddings">Embeddings</a>.
-	 */
-	public enum EmbeddingModel {
-
-		/**
-		 * DIMENSION: 384
-		 */
-		EMBEDDING_V1("embedding-v1"),
-
-		/**
-		 * DIMENSION: 1024
-		 */
-		BGE_LARGE_ZH("bge_large_zh"),
-
-		/**
-		 * DIMENSION: 1024
-		 */
-		BGE_LARGE_EN("bge_large_en"),
-
-		/**
-		 * DIMENSION: 1024
-		 */
-		TAO_8K("tao_8k");
-
-		public final String  value;
-
-		EmbeddingModel(String value) {
 			this.value = value;
 		}
 
@@ -563,132 +494,6 @@ public class XingHuoApi extends AuthApi {
 				 */
 				@JsonProperty("total_tokens") int totalTokens
 		) {}
-	}
-
-	/**
-	 * Represents a streamed chunk of a chat completion response returned by model, based on the provided input.
-	 *
-	 * @param id A unique identifier for the chat completion. Each chunk has the same ID.
-	 * @param object The object type, which is always 'chat.completion.chunk'.
-	 * @param created The Unix timestamp (in seconds) of when the chat completion was created. Each chunk has the same
-	 * timestamp.
-	 * @param result Result of chat completion message.
-	 */
-	@JsonInclude(Include.NON_NULL)
-	public record ChatCompletionChunk(
-			@JsonProperty("id") String id,
-			@JsonProperty("object") String object,
-			@JsonProperty("created") Long created,
-			@JsonProperty("result") String result,
-			@JsonProperty("finish_reason") String finishReason,
-			@JsonProperty("is_end") Boolean end,
-
-			@JsonProperty("usage") Usage usage
-			) {
-	}
-
-	/**
-	 * Creates an embedding vector representing the input text.
-	 *
-	 * @param texts Input text to embed, encoded as a string or array of tokens.
-	 * @param user A unique identifier representing your end-user, which can help QianFan to
-	 * 		monitor and detect abuse.
-	 */
-	@JsonInclude(Include.NON_NULL)
-	public record EmbeddingRequest(
-			@JsonProperty("input") List<String> texts,
-			@JsonProperty("model") String model,
-			@JsonProperty("user_id") String user
-			) {
-
-
-		/**
-		 * Create an embedding request with the given input.
-		 * Embedding model is set to 'bge_large_zh'.
-		 * @param text Input text to embed.
-		 */
-		public EmbeddingRequest(String text) {
-			this(List.of(text), DEFAULT_EMBEDDING_MODEL, null);
-		}
-
-
-		/**
-		 * Create an embedding request with the given input.
-		 * @param text Input text to embed.
-		 * @param model ID of the model to use.
-		 * @param userId A unique identifier representing your end-user, which can help QianFan to
-		 * 		monitor and detect abuse.
-		 */
-		public EmbeddingRequest(String text, String model, String userId) {
-			this(List.of(text), model, userId);
-		}
-
-		/**
-		 * Create an embedding request with the given input.
-		 * Embedding model is set to 'bge_large_zh'.
-		 * @param texts Input text to embed.
-		 */
-		public EmbeddingRequest(List<String> texts) {
-			this(texts, DEFAULT_EMBEDDING_MODEL, null);
-		}
-
-		/**
-		 * Create an embedding request with the given input.
-		 * @param texts Input text to embed.
-		 * @param model ID of the model to use.
-		 */
-		public EmbeddingRequest(List<String> texts, String model) {
-			this(texts, model, null);
-		}
-	}
-
-	/**
-	 * Represents an embedding vector returned by embedding endpoint.
-	 *
-	 * @param index The index of the embedding in the list of embeddings.
-	 * @param embedding The embedding vector, which is a list of floats. The length of
-	 * vector depends on the model.
-	 * @param object The object type, which is always 'embedding'.
-	 */
-	@JsonInclude(Include.NON_NULL)
-	public record Embedding(
-			// @formatter:off
-			@JsonProperty("index") Integer index,
-			@JsonProperty("embedding") float[] embedding,
-			@JsonProperty("object") String object) {
-		// @formatter:on
-
-		/**
-		 * Create an embedding with the given index, embedding and object type set to
-		 * 'embedding'.
-		 * @param index The index of the embedding in the list of embeddings.
-		 * @param embedding The embedding vector, which is a list of floats. The length of
-		 * vector depends on the model.
-		 */
-		public Embedding(Integer index, float[] embedding) {
-			this(index, embedding, "embedding");
-		}
-
-	}
-
-	/**
-	 * List of multiple embedding responses.
-	 *
-	 * @param object Must have value "embedding_list".
-	 * @param data List of entities.
-	 * @param model ID of the model to use.
-	 * @param usage Usage statistics for the completion request.
-	 */
-	@JsonInclude(Include.NON_NULL)
-	public record EmbeddingList(
-	// @formatter:off
-			@JsonProperty("object") String object,
-			@JsonProperty("data") List<Embedding> data,
-			@JsonProperty("model") String model,
-			@JsonProperty("error_code") String errorCode,
-			@JsonProperty("error_msg") String errorNsg,
-			@JsonProperty("usage") Usage usage) {
-		// @formatter:on
 	}
 
 }

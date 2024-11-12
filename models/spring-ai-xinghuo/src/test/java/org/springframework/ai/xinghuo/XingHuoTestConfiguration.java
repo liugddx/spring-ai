@@ -63,14 +63,4 @@ public class XingHuoTestConfiguration {
 		return new XingHuoChatModel(api);
 	}
 
-	@Bean
-	public EmbeddingModel XingHuoEmbeddingModel(XingHuoApi api) {
-		return new XingHuoEmbeddingModel(api);
-	}
-
-	@Bean
-	public ImageModel XingHuoImageModel(XingHuoImageApi api) {
-		return new XingHuoImageModel(api);
-	}
-
 }

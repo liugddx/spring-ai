@@ -51,7 +51,6 @@ import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionMessage.Role;
 import org.springframework.ai.xinghuo.api.XingHuoApi.ChatCompletionRequest;
 import org.springframework.ai.xinghuo.api.XingHuoConstants;
-import org.springframework.ai.xinghuo.metadata.XingHuoUsage;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.support.RetryTemplate;

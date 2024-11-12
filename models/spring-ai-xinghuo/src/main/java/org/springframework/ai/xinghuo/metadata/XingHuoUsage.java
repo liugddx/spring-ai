@@ -21,7 +21,7 @@ import org.springframework.ai.xinghuo.api.XingHuoApi;
 import org.springframework.util.Assert;
 
 /**
- * {@link Usage} implementation for {@literal QianFan}.
+ * {@link Usage} implementation for {@literal XingHuo}.
  *
  * @author Thomas Vitale
  */
@@ -30,7 +30,7 @@ public class XingHuoUsage implements Usage {
 	private final XingHuoApi.Usage usage;
 
 	protected XingHuoUsage(XingHuoApi.Usage usage) {
-		Assert.notNull(usage, "QianFan Usage must not be null");
+		Assert.notNull(usage, "XingHuo Usage must not be null");
 		this.usage = usage;
 	}
 
@@ -44,17 +44,23 @@ public class XingHuoUsage implements Usage {
 
 	@Override
 	public Long getPromptTokens() {
-		return getUsage().promptTokens().longValue();
+		Integer promptTokens = getUsage().promptTokens();
+		return promptTokens != null ? promptTokens.longValue() : 0;
 	}
 
 	@Override
 	public Long getGenerationTokens() {
-		return 0L;
+		Integer generationTokens = getUsage().completionTokens();
+		return generationTokens != null ? generationTokens.longValue() : 0;
 	}
 
 	@Override
 	public Long getTotalTokens() {
-		return getUsage().totalTokens().longValue();
+		Integer totalTokens = getUsage().totalTokens();
+		if (totalTokens != null) {
+			return totalTokens.longValue();
+		}
+		return getPromptTokens() + getGenerationTokens();
 	}
 
 	@Override

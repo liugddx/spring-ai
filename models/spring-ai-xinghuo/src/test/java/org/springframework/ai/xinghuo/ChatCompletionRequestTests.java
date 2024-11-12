@@ -19,9 +19,10 @@ package org.springframework.ai.xinghuo;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.xinghuo.XingHuoChatModel;
-import org.springframework.ai.xinghuo.XingHuoChatOptions;
+import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.xinghuo.api.XingHuoApi;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,9 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ChatCompletionRequestTests {
 
 	@Test
-	public void createRequestWithChatOptions() {
+	public void createRequestWithChatOptions() throws Exception {
 
-		var client = new XingHuoChatModel(new XingHuoApi("TEST", "TEST"),
+		var client = new XingHuoChatModel(new XingHuoApi("localhost", "/api/v1", "API_KEY", "SECRET_KEY","SECRET_KEY"
+				, RestClient.builder(), WebClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER),
 				XingHuoChatOptions.builder().withModel("DEFAULT_MODEL").withTemperature(66.6).build());
 
 		var request = client.createRequest(new Prompt("Test message content"), false);
