@@ -39,22 +39,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 		@EnabledIfEnvironmentVariable(named = "QIANFAN_SECRET_KEY", matches = ".+") })
 public class XingHuoApiIT {
 
-	XingHuoApi xingHuoApi = new XingHuoApi("localhost", "/api/v1", "API_KEY", "SECRET_KEY","SECRET_KEY"
-			, RestClient.builder(), WebClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
+	XingHuoApi xingHuoApi = new XingHuoApi("localhost", "/api/v1", "API_KEY", "SECRET_KEY", "SECRET_KEY",
+			RestClient.builder(), WebClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 
 	public XingHuoApiIT() throws Exception {
-	});
+	};
 
 	@Test
 	void chatCompletionEntity() {
 		ChatCompletionMessage chatCompletionMessage = new ChatCompletionMessage("Hello world", Role.USER);
-		ResponseEntity<ChatCompletion> response = this.xingHuoApi.chatCompletionEntity(new ChatCompletionRequest(XingHuoApi.ChatModel.GENERAL_V_3_5.getValue(),
-				"user_123456", List.of(chatCompletionMessage), 0.7, 1.0,4,0.0,0.0,false,4096,
-				null,null,null));
+		ResponseEntity<ChatCompletion> response = this.xingHuoApi.chatCompletionEntity(new ChatCompletionRequest(
+				XingHuoApi.ChatModel.GENERAL_V_3_5.getValue(), List.of(chatCompletionMessage)));
 
 		assertThat(response).isNotNull();
 		assertThat(response.getBody()).isNotNull();
 	}
-
 
 }

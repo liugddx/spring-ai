@@ -34,7 +34,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
-import org.springframework.ai.qianfan.XingHuoTestConfiguration;
+import org.springframework.ai.xinghuo.XingHuoTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;

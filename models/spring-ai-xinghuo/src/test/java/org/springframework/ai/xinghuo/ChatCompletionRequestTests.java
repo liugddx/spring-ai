@@ -34,8 +34,9 @@ public class ChatCompletionRequestTests {
 	@Test
 	public void createRequestWithChatOptions() throws Exception {
 
-		var client = new XingHuoChatModel(new XingHuoApi("localhost", "/api/v1", "API_KEY", "SECRET_KEY","SECRET_KEY"
-				, RestClient.builder(), WebClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER),
+		var client = new XingHuoChatModel(
+				new XingHuoApi("localhost", "/api/v1", "API_KEY", "SECRET_KEY", "SECRET_KEY", RestClient.builder(),
+						WebClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER),
 				XingHuoChatOptions.builder().withModel("DEFAULT_MODEL").withTemperature(66.6).build());
 
 		var request = client.createRequest(new Prompt("Test message content"), false);

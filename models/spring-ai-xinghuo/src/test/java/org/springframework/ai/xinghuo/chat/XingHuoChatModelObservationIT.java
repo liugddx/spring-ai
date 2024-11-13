@@ -25,6 +25,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
+import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.xinghuo.XingHuoChatModel;
+import org.springframework.ai.xinghuo.XingHuoChatOptions;
+import org.springframework.ai.xinghuo.api.XingHuoApi;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
@@ -33,9 +39,6 @@ import org.springframework.ai.chat.observation.DefaultChatModelObservationConven
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.observation.conventions.AiOperationType;
 import org.springframework.ai.observation.conventions.AiProvider;
-import org.springframework.ai.qianfan.QianFanChatModel;
-import org.springframework.ai.qianfan.QianFanChatOptions;
-import org.springframework.ai.qianfan.api.XinHuoApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,7 +50,7 @@ import static org.springframework.ai.chat.observation.ChatModelObservationDocume
 import static org.springframework.ai.chat.observation.ChatModelObservationDocumentation.LowCardinalityKeyNames;
 
 /**
- * Integration tests for observation instrumentation in {@link QianFanChatModel}.
+ * Integration tests for observation instrumentation in {@link XingHuoChatModel}.
  *
  * @author Geng Rong
  */
@@ -60,7 +63,7 @@ public class XingHuoChatModelObservationIT {
 	TestObservationRegistry observationRegistry;
 
 	@Autowired
-	QianFanChatModel chatModel;
+	XingHuoChatModel chatModel;
 
 	@BeforeEach
 	void beforeEach() {
@@ -70,8 +73,8 @@ public class XingHuoChatModelObservationIT {
 	@Test
 	void observationForChatOperation() {
 
-		var options = QianFanChatOptions.builder()
-			.withModel(XinHuoApi.ChatModel.ERNIE_Speed_8K.getValue())
+		var options = XingHuoChatOptions.builder()
+			.withModel(XingHuoApi.ChatModel.GENERAL_V_3_5.getValue())
 			.withFrequencyPenalty(0.0)
 			.withMaxTokens(2048)
 			.withPresencePenalty(0.0)
@@ -93,8 +96,8 @@ public class XingHuoChatModelObservationIT {
 
 	@Test
 	void observationForStreamingChatOperation() {
-		var options = QianFanChatOptions.builder()
-			.withModel(XinHuoApi.ChatModel.ERNIE_Speed_8K.getValue())
+		var options = XingHuoChatOptions.builder()
+			.withModel(XingHuoApi.ChatModel.GENERAL_V_3_5.getValue())
 			.withFrequencyPenalty(0.0)
 			.withMaxTokens(2048)
 			.withPresencePenalty(0.0)
@@ -129,12 +132,12 @@ public class XingHuoChatModelObservationIT {
 			.doesNotHaveAnyRemainingCurrentObservation()
 			.hasObservationWithNameEqualTo(DefaultChatModelObservationConvention.DEFAULT_NAME)
 			.that()
-			.hasContextualNameEqualTo("chat " + XinHuoApi.ChatModel.ERNIE_Speed_8K.getValue())
+			.hasContextualNameEqualTo("chat " + XingHuoApi.ChatModel.GENERAL_V_3_5.getValue())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.AI_OPERATION_TYPE.asString(),
 					AiOperationType.CHAT.value())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.AI_PROVIDER.asString(), AiProvider.QIANFAN.value())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.REQUEST_MODEL.asString(),
-					XinHuoApi.ChatModel.ERNIE_Speed_8K.getValue())
+					XingHuoApi.ChatModel.GENERAL_V_3_5.getValue())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.RESPONSE_MODEL.asString(), responseMetadata.getModel())
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.REQUEST_FREQUENCY_PENALTY.asString(), "0.0")
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.REQUEST_MAX_TOKENS.asString(), "2048")
@@ -164,13 +167,15 @@ public class XingHuoChatModelObservationIT {
 		}
 
 		@Bean
-		public XinHuoApi qianFanApi() {
-			return new XinHuoApi(System.getenv("QIANFAN_API_KEY"), System.getenv("QIANFAN_SECRET_KEY"));
+		public XingHuoApi xingHuoApi() throws Exception {
+			return new XingHuoApi("localhost", "/api/v1", "API_KEY", System.getenv("QIANFAN_API_KEY"),
+					System.getenv("QIANFAN_SECRET_KEY"), RestClient.builder(), WebClient.builder(),
+					RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 		}
 
 		@Bean
-		public QianFanChatModel qianFanChatModel(XinHuoApi xinHuoApi, TestObservationRegistry observationRegistry) {
-			return new QianFanChatModel(xinHuoApi, QianFanChatOptions.builder().build(),
+		public XingHuoChatModel qianFanChatModel(XingHuoApi xinHuoApi, TestObservationRegistry observationRegistry) {
+			return new XingHuoChatModel(xinHuoApi, XingHuoChatOptions.builder().build(),
 					RetryTemplate.defaultInstance(), observationRegistry);
 		}
 

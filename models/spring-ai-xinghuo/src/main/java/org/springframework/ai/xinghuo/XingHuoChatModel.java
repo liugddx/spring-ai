@@ -134,7 +134,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	 * @param observationRegistry The ObservationRegistry used for instrumentation.
 	 */
 	public XingHuoChatModel(XingHuoApi xingHuoApi, XingHuoChatOptions options, RetryTemplate retryTemplate,
-							ObservationRegistry observationRegistry) {
+			ObservationRegistry observationRegistry) {
 		Assert.notNull(xingHuoApi, "XingHuoApi must not be null");
 		Assert.notNull(options, "Options must not be null");
 		Assert.notNull(retryTemplate, "RetryTemplate must not be null");
@@ -148,7 +148,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	@Override
 	public ChatResponse call(Prompt prompt) {
 
-		ChatCompletionRequest request = createRequest(prompt.getOptions().getModel(),prompt, false);
+		ChatCompletionRequest request = createRequest(prompt.getOptions().getModel(), prompt, false);
 
 		ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 			.prompt(prompt)
@@ -172,13 +172,12 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 
 				List<Choice> choices = chatCompletion.choices();
 				if (choices == null) {
-					logger.warn("No choices returned for prompt: {}, because: {}}", prompt,
-							chatCompletion.message());
+					logger.warn("No choices returned for prompt: {}, because: {}}", prompt, chatCompletion.message());
 					return new ChatResponse(List.of());
 				}
 
 				List<Generation> generations = choices.stream().map(choice -> {
-					// @formatter:off
+			// @formatter:off
 					// if the choice is a web search tool call, return last message of choice.messages
 					ChatCompletionMessage message = null;
 					if (choice.message() != null) {
@@ -191,7 +190,8 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 					return new Generation(new AssistantMessage(choice.content(), metadata));
 				}).toList();
 
-				ChatResponse chatResponse = new ChatResponse(generations, from(completionEntity.getBody(),prompt.getOptions().getModel()));
+				ChatResponse chatResponse = new ChatResponse(generations,
+						from(completionEntity.getBody(), prompt.getOptions().getModel()));
 				observationContext.setResponse(chatResponse);
 				return chatResponse;
 			});
@@ -200,7 +200,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	@Override
 	public Flux<ChatResponse> stream(Prompt prompt) {
 
-		//todo
+		// todo
 
 		return null;
 	}
@@ -208,7 +208,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 	/**
 	 * Accessible for testing.
 	 */
-	public ChatCompletionRequest createRequest(String model,Prompt prompt, boolean stream) {
+	public ChatCompletionRequest createRequest(String model, Prompt prompt, boolean stream) {
 		var chatCompletionMessages = prompt.getInstructions()
 			.stream()
 			.map(m -> new ChatCompletionMessage(m.getContent(),
@@ -220,7 +220,7 @@ public class XingHuoChatModel implements ChatModel, StreamingChatModel {
 			throw new IllegalArgumentException("Only one system message is allowed in the prompt");
 		}
 
-		var request = new ChatCompletionRequest(model,chatCompletionMessages, stream);
+		var request = new ChatCompletionRequest(model, chatCompletionMessages, stream);
 
 		if (this.defaultOptions != null) {
 			request = ModelOptionsUtils.merge(this.defaultOptions, request, ChatCompletionRequest.class);
